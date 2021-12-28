@@ -53,3 +53,27 @@ echo 'ATTRS{idVendor}=="fcf", ATTRS{idProduct}=="1009", MODE="0666"' > /etc/udev
 udevadm control --reload-rules
 ```
 After this, unplug and re-plug the dongle.
+
+## Building
+
+Currently Maven and Bazel build files are there but active work is done only on
+the Bazel build system. Therefore that is preferred.
+
+Install:
+
+- Bazel 4.2
+- OpenJDK11
+
+If you have Nix installed, you can get a shell with the dependencies like this:
+
+```
+nix-shell -p gnumake openjdk bazel_4
+```
+
+Build:
+
+```sh
+# Commandline
+bazel build bazel build //:j_antplus
+ls -l bazel-bin/libj_antplus.jar
+```
