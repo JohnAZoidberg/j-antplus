@@ -1,6 +1,9 @@
 package be.glever.antplus.common.datapage;
 
-public class DataPage87ErrorDescription extends AbstractAntPlusDataPage {
+import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
+
+public class DataPage87ErrorDescription
+extends AbstractAntPlusDataPage {
     public static final byte PAGE_NR = 87;
 
     public DataPage87ErrorDescription(byte[] dataPageBytes) {

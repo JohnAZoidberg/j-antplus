@@ -13,76 +13,51 @@ import be.glever.ant.message.data.BroadcastDataMessage;
 import be.glever.ant.usb.AntUsbDevice;
 import be.glever.ant.util.ByteUtils;
 import be.glever.util.logging.Log;
-import reactor.core.publisher.Flux;
-
 import java.time.Duration;
 import java.util.Arrays;
+import reactor.core.publisher.Flux;
 
-public class FecChannel extends AntChannel {
-	public static final byte CHANNEL_FREQUENCY = 0x39;  // RF Channel 57 (2457MHz)
-	public static final byte[] DEVICE_NUMBER_WILDCARD = {0x00, 0x00};
-	public static final byte DEFAULT_PUBLIC_NETWORK = 0x00;
-	private static final Log LOG = Log.getLogger(FecChannel.class);
-	private final AntUsbDevice device;
+public class FecChannel
+extends AntChannel {
+    public static final byte CHANNEL_FREQUENCY = 0x39;  // RF Channel 57 (2457MHz)
+    public static final byte[] DEVICE_NUMBER_WILDCARD = new byte[]{0, 0};
+    public static final byte DEFAULT_PUBLIC_NETWORK = 0;
+    private static final Log LOG = Log.getLogger(FecChannel.class);
+    private final AntUsbDevice device;
+    public static final byte[] CHANNEL_PERIOD = ByteUtils.toUShort(8192);
+    private Flux<AntMessage> eventFlux;
 
-	/**
-	 * Foo
-	 * <p>
-	 * Allowed values:
-	 * 8192/32768 seconds (4.00 Hz)
-	 */
-	public static final byte[] CHANNEL_PERIOD = ByteUtils.toUShort(8192);
+    public FecChannel(AntUsbDevice device) {
+        this(device, DEVICE_NUMBER_WILDCARD);
+    }
 
-	private Flux<AntMessage> eventFlux;
+    public FecChannel(AntUsbDevice device, byte[] deviceNumber) {
+        this.device = device;
+        this.setChannelType(AntChannelType.BIDIRECTIONAL_SLAVE);
+        this.setNetwork(new AntChannelNetwork((byte) 0, AntNetworkKeys.ANT_PLUS_NETWORK_KEY));
+        this.setRfFrequency(CHANNEL_FREQUENCY);
+        this.setChannelId(new AntChannelId(AntChannelTransmissionType.PAIRING_TRANSMISSION_TYPE, AntPlusDeviceType.Fec, deviceNumber));
+        this.setChannelPeriod(CHANNEL_PERIOD);
+        this.device.openChannel(this).block(Duration.ofSeconds(10L));
+    }
 
-	/**
-	 * Pair with any (the first found) Fec.
-	 *
-	 * @param device
-	 */
-	public FecChannel(AntUsbDevice device) {
-		this(device, DEVICE_NUMBER_WILDCARD);
-	}
+    @Override
+    public void subscribeTo(Flux<AntMessage> messageFlux) {
+        this.eventFlux = messageFlux.filter(this::isMatchingAntMessage).distinctUntilChanged(AntMessage::toByteArray, Arrays::equals);
+    }
 
-	/**
-	 * Pair with a known device.
-	 * <p>
-	 * > The device number needs to be as unique as possible across production units. An example of achieving this specification is
-	 * to use the lowest two bytes of the serial number of the device for the device number of the ANT channel parameter; ensure
-	 * that the device has a set serial number.
-	 *
-	 * @param device
-	 * @param deviceNumber
-	 */
-	public FecChannel(AntUsbDevice device, byte[] deviceNumber) {
-		this.device = device;
-		setChannelType(AntChannelType.BIDIRECTIONAL_SLAVE);
-		setNetwork(new AntChannelNetwork(DEFAULT_PUBLIC_NETWORK, AntNetworkKeys.ANT_PLUS_NETWORK_KEY));
-		setRfFrequency(CHANNEL_FREQUENCY);
-		setChannelId(new AntChannelId(AntChannelTransmissionType.PAIRING_TRANSMISSION_TYPE, AntPlusDeviceType.Fec, deviceNumber));
-		setChannelPeriod(CHANNEL_PERIOD);
+    @Override
+    public Flux<AntMessage> getEvents() {
+        return this.eventFlux;
+    }
 
-		this.device.openChannel(this).block(Duration.ofSeconds(10));
-	}
-
-	@Override
-	public void subscribeTo(Flux<AntMessage> messageFlux) {
-		eventFlux = messageFlux
-				.filter(this::isMatchingAntMessage)
-				.distinctUntilChanged(AntMessage::toByteArray, Arrays::equals);
-	}
-
-	@Override
-	public Flux<AntMessage> getEvents() {
-		return eventFlux;
-	}
-
-	private boolean isMatchingAntMessage(AntMessage message) {
-		if (message.getMessageId() == BroadcastDataMessage.MSG_ID) {
-			return ((BroadcastDataMessage) message).getChannelNumber() == super.getChannelNumber();
-		} else if (message.getMessageId() == ChannelEventOrResponseMessage.MSG_ID) {
-			return ((ChannelEventOrResponseMessage) message).getChannelNumber() == super.getChannelNumber();
-		}
-		return false;
-	}
+    private boolean isMatchingAntMessage(AntMessage message2) {
+        if (message2.getMessageId() == 78) {
+            return ((BroadcastDataMessage)message2).getChannelNumber() == super.getChannelNumber();
+        }
+        if (message2.getMessageId() == 64) {
+            return ((ChannelEventOrResponseMessage)message2).getChannelNumber() == super.getChannelNumber();
+        }
+        return false;
+    }
 }

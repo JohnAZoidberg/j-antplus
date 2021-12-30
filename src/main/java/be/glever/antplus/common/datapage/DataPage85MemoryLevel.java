@@ -1,6 +1,9 @@
 package be.glever.antplus.common.datapage;
 
-public class DataPage85MemoryLevel extends AbstractAntPlusDataPage {
+import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
+
+public class DataPage85MemoryLevel
+extends AbstractAntPlusDataPage {
     public static final byte PAGE_NR = 85;
 
     public DataPage85MemoryLevel(byte[] dataPageBytes) {

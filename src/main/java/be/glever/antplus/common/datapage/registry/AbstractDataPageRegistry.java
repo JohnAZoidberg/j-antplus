@@ -1,5 +1,6 @@
 package be.glever.antplus.common.datapage.registry;
 
+import be.glever.ant.util.ByteUtils;
 import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
 import be.glever.util.logging.Log;
 
@@ -12,9 +13,7 @@ import java.util.Map;
  * this base class allows grouping multiple registries together for a given Ant+ device type.
  */
 public abstract class AbstractDataPageRegistry {
-
-    private Map<Byte, DataPageBuilder> registry = new HashMap<>();
-
+    private Map<Byte, DataPageBuilder> registry = new HashMap<Byte, DataPageBuilder>();
     private static final Log LOG = Log.getLogger(AbstractDataPageRegistry.class);
 
     public AbstractDataPageRegistry() {
@@ -35,7 +34,14 @@ public abstract class AbstractDataPageRegistry {
     public AbstractAntPlusDataPage constructDataPage(byte[] payLoadBytes) {
         DataPageBuilder dpBuilder = registry.get(payLoadBytes[0]);
         if (dpBuilder == null) {
-            LOG.info(() -> "Data page " + payLoadBytes[0] + " not yet supported");
+            int messageId = ByteUtils.toInt(payLoadBytes[0]);
+            if (messageId >= 112 && messageId <= 127) {
+                LOG.info(() -> "Manufacturer Specific for Toggle Bit Device Profiles data page " + messageId + " not yet supported");
+            } else if (messageId >= 224 && messageId <= 255) {
+                LOG.info(() -> "Manufacturer Specific data page " + messageId + " not yet supported");
+            } else {
+                LOG.info(() -> "Data page " + payLoadBytes[0] + " not yet supported");
+            }
             return null;
         }
 
@@ -44,7 +50,7 @@ public abstract class AbstractDataPageRegistry {
 
     protected void add(byte pageNumber, DataPageBuilder builder) {
         if (this.registry.containsKey(pageNumber)) {
-            throw new IllegalStateException("Duplicate DataPage defined in registry: " + pageNumber);
+            return;
         }
         this.registry.put(pageNumber, builder);
     }

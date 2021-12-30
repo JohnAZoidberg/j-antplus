@@ -25,7 +25,6 @@ public enum FecState {
         return value;
     }
 
-
     @Override
     public String toString() {
         switch (this) {

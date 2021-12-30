@@ -6,7 +6,16 @@ import be.glever.ant.message.AntBlockingMessage;
 import be.glever.ant.message.AntMessage;
 import be.glever.ant.message.channel.ChannelEventOrResponseMessage;
 import be.glever.ant.message.channel.ChannelEventResponseCode;
-import be.glever.ant.message.configuration.*;
+import be.glever.ant.message.configuration.AssignChannelMessage;
+import be.glever.ant.message.configuration.ChannelIdMessage;
+import be.glever.ant.message.configuration.ChannelPeriodMessage;
+import be.glever.ant.message.configuration.ChannelRfFrequencyMessage;
+import be.glever.ant.message.configuration.EnableExtendedMessages;
+import be.glever.ant.message.configuration.ExtendedAssignment;
+import be.glever.ant.message.configuration.NetworkKeyMessage;
+import be.glever.ant.message.configuration.SearchTimeoutMessage;
+import be.glever.ant.message.configuration.SetLowPrioritySearchTimeoutMessage;
+import be.glever.ant.message.configuration.UnassignChannelMessage;
 import be.glever.ant.message.control.OpenChannelMessage;
 import be.glever.ant.message.control.RequestMessage;
 import be.glever.ant.message.control.ResetSystemMessage;
@@ -79,79 +88,98 @@ public class AntUsbDevice implements Closeable {
     }
 
     public void initialize() throws AntException {
-        if (isInitialized)
+        if (this.isInitialized) {
             return;
-
+        }
         try {
-            initUsbInterface();
-            initAntDevice();
-            isInitialized = true;
-        } catch (Exception e) {
+            this.initUsbInterface();
+            this.initAntDevice();
+            this.isInitialized = true;
+        }
+        catch (Exception e) {
             throw new AntException(e);
         }
     }
 
     public boolean isInitialized() {
-        return isInitialized;
+        return this.isInitialized;
     }
 
     @Override
     public void close() throws IOException {
         try {
-            resetUsbDevice();
-            isInitialized = false;
-        } catch (Exception e) {
+            this.resetUsbDevice();
+            this.isInitialized = false;
+        }
+        catch (Exception e) {
             LOG.error(() -> "Reset ant stick failed. Continuing with shutdown of usb interface.", e);
         }
-
         try {
             this.antUsbReader.stop();
-            UsbInterface activeUsbInterface = getActiveUsbInterface();
+            UsbInterface activeUsbInterface = this.getActiveUsbInterface();
             if (activeUsbInterface.isClaimed()) {
                 activeUsbInterface.release();
             }
-            isInitialized = false;
-        } catch (Exception e) {
+            this.isInitialized = false;
+        }
+        catch (Exception e) {
             throw new IOException(e.getMessage(), e);
         }
     }
 
-    /**
-     * Closes any channel still open between the stick and ant devices.
-     */
     public void closeAllChannels() throws AntException {
-        short maxChannels = capabilities.getMaxChannels();
-        for (int i = 0; i < maxChannels; i++) {
-            RequestMessage requestMessage = new RequestMessage((byte) i, ChannelStatusMessage.MSG_ID);
-            ChannelStatusMessage responseMessage = (ChannelStatusMessage) sendBlocking(requestMessage);
+        int maxChannels = this.capabilities.getMaxChannels();
+        block4: for (int i = 0; i < maxChannels; i++) {
+            RequestMessage requestMessage = new RequestMessage((byte)i, (byte) 82);
+            ChannelStatusMessage responseMessage = (ChannelStatusMessage)this.sendBlocking(requestMessage);
             byte channelNumber = responseMessage.getChannelNumber();
             ChannelStatusMessage.CHANNEL_STATUS channelStatus = responseMessage.getChannelStatus();
-            LOG.debug(() -> format("Channel %s is in state %s.", channelNumber, channelStatus));
-
+            LOG.debug(() -> String.format("Channel %s is in state %s.", new Object[]{channelNumber, channelStatus}));
             switch (channelStatus) {
-                case UnAssigned:
-                    break;
-                case Assigned:
-                    closeChannel(channelNumber);
-                    break;
-                default:
+                case UnAssigned: {
+                    continue block4;
+                }
+                case Assigned: {
+                    this.closeChannel(channelNumber);
+                    continue block4;
+                }
+                default: {
                     throw new AntException("Don't know (yet) how to close channel in current state " + channelStatus + ".");
+                }
             }
         }
     }
 
     public AntUsbDeviceCapabilities getCapabilities() {
-        return capabilities;
+        return this.capabilities;
     }
 
     public Mono<Void> openChannel(AntChannel channel) {
-
         byte channelNumber = getAvailableChannelNumber();
-
         BiFunction<AntMessage, AntMessage, Boolean> responseMatcher = RequestMatcher::isMatchingResponse;
         return send(new NetworkKeyMessage(channelNumber, channel.getNetwork().getNetworkKey()), responseMatcher)
                 .then(send(new AssignChannelMessage(channelNumber, channel.getChannelType().getValue(), channel.getNetwork().getNetworkNumber()), responseMatcher))
-                .then(send(new ChannelIdMessage(channelNumber, channel.getChannelId().getDeviceNumber(), channel.getChannelId().getDeviceType(), channel.getChannelId().getTransmissionType().getValue()), responseMatcher))
+                .then(send(new ChannelIdMessage(channelNumber, channel.getChannelId().getDeviceNumber(), channel.getChannelId().getDeviceTypeId(), channel.getChannelId().getTransmissionType().getValue()), responseMatcher))
+                .then(send(new ChannelPeriodMessage(channelNumber, channel.getChannelPeriod()), responseMatcher))
+                .then(send(new ChannelRfFrequencyMessage(channelNumber, channel.getRfFrequency()), responseMatcher))
+                .then(send(new OpenChannelMessage(channelNumber), responseMatcher))
+                .then(Mono.fromRunnable(() -> {
+                    this.antChannels[channelNumber] = channel;
+                    channel.setChannelNumber(channelNumber);
+                    channel.subscribeTo(this.antMessageProcessor);
+                }))
+                .then();
+    }
+
+    public Mono<Void> openBackgroundScanningChannel(AntChannel channel) {
+        byte channelNumber = this.getAvailableChannelNumber();
+        BiFunction<AntMessage, AntMessage, Boolean> responseMatcher = RequestMatcher::isMatchingResponse;
+        return send(new NetworkKeyMessage(channelNumber, channel.getNetwork().getNetworkKey()), responseMatcher)
+                .then(send(new AssignChannelMessage(channelNumber, channel.getChannelType().getValue(), channel.getNetwork().getNetworkNumber(), ExtendedAssignment.BACKGROUND_SCANNING_ENABLE), responseMatcher))
+                .then(send(new ChannelIdMessage(channelNumber, channel.getChannelId().getDeviceNumber(), channel.getChannelId().getDeviceTypeId(), channel.getChannelId().getTransmissionType().getValue()), responseMatcher))
+                .then(send(new EnableExtendedMessages(true), responseMatcher))
+                .then(send(new SearchTimeoutMessage(channelNumber, 10), responseMatcher))
+                .then(send(new SetLowPrioritySearchTimeoutMessage(channelNumber, 10), responseMatcher))
                 .then(send(new ChannelPeriodMessage(channelNumber, channel.getChannelPeriod()), responseMatcher))
                 .then(send(new ChannelRfFrequencyMessage(channelNumber, channel.getRfFrequency()), responseMatcher))
                 .then(send(new OpenChannelMessage(channelNumber), responseMatcher))
@@ -178,12 +206,20 @@ public class AntUsbDevice implements Closeable {
      * @param requestMessage The message to send.
      */
     public Mono<AntMessage> send(AntMessage requestMessage, BiFunction<AntMessage, AntMessage, Boolean> responseFilter) {
-        Flux<AntMessage> response = this.antMessageProcessor
-                .filter(responseMessage -> responseFilter.apply(requestMessage, responseMessage))
-                .concatMap(AntUsbDevice::mapToErrorIfRequired);
+        Flux response = this.antMessageProcessor.filter(responseMessage -> (Boolean)responseFilter.apply(requestMessage, (AntMessage)responseMessage)).concatMap(AntUsbDevice::mapToErrorIfRequired);
+        Mono messageSender = Mono.fromRunnable(() -> this.antUsbWriter.write(requestMessage));
+        return Flux.merge(response, messageSender).map(antMessage -> (AntMessage)antMessage).next();
+    }
 
-        Mono<Void> messageSender = Mono.fromRunnable(() -> this.antUsbWriter.write(requestMessage));
-        return Flux.merge(response, messageSender).map(antMessage -> (AntMessage) antMessage).next();
+    @Deprecated
+    public AntMessage sendBlocking(AntBlockingMessage requestMessage, BiFunction<AntMessage, AntMessage, Boolean> responseValidator) {
+        Flux response = this.antMessageProcessor.filter(responseMessage -> RequestMatcher.isMatchingResponse(requestMessage, responseMessage)).concatMap(AntUsbDevice::mapToErrorIfRequired).take(1L);
+        Mono messageSender = Mono.fromRunnable(() -> this.antUsbWriter.write(requestMessage));
+        AntMessage responseMessage2 = (AntMessage)Flux.merge(response, messageSender).blockFirst(Duration.ofSeconds(10L));
+        if (!responseValidator.apply(requestMessage, responseMessage2).booleanValue()) {
+            throw new IllegalStateException("Message wasn't responded properly to");
+        }
+        return responseMessage2;
     }
 
     /**
@@ -195,13 +231,9 @@ public class AntUsbDevice implements Closeable {
      */
     @Deprecated
     public AntMessage sendBlocking(AntBlockingMessage requestMessage) {
-        Flux<AntMessage> response = this.antMessageProcessor
-                .filter(responseMessage -> RequestMatcher.isMatchingResponse(requestMessage, responseMessage))
-                .concatMap(AntUsbDevice::mapToErrorIfRequired)
-                .take(1);
-
-        Mono<Void> messageSender = Mono.fromRunnable(() -> this.antUsbWriter.write(requestMessage));
-        return (AntMessage) Flux.merge(response, messageSender).blockFirst(Duration.ofSeconds(10));
+        Flux response = this.antMessageProcessor.filter(responseMessage -> RequestMatcher.isMatchingResponse(requestMessage, responseMessage)).concatMap(AntUsbDevice::mapToErrorIfRequired).take(1L);
+        Mono messageSender = Mono.fromRunnable(() -> this.antUsbWriter.write(requestMessage));
+        return (AntMessage)Flux.merge(response, messageSender).blockFirst(Duration.ofSeconds(10L));
     }
 
     public byte[] getAntVersion() {
@@ -221,25 +253,16 @@ public class AntUsbDevice implements Closeable {
         throw new IllegalStateException("No available channels found");
     }
 
-    private void initUsbInterface() throws AntException, UsbException {
+    public void initUsbInterface() throws AntException, UsbException {
         UsbInterface usbInterface = getActiveUsbInterface();
         if (usbInterface.isClaimed()) {
             throw new AntException("Usb device already claimed");
         }
 
         usbInterface.claim(AntUsbDevice::forceClaim);
-
-        @SuppressWarnings("unchecked")
         List<UsbEndpoint> usbEndpoints = usbInterface.getUsbEndpoints();
-        UsbEndpoint inEndpoint = usbEndpoints.stream()
-                .filter(endpoint -> endpoint.getDirection() == UsbConst.ENDPOINT_DIRECTION_IN)
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("Could not obtain usb input pipe."));
-        UsbEndpoint outEndpoint = usbEndpoints.stream()
-                .filter(endpoint -> endpoint.getDirection() == UsbConst.ENDPOINT_DIRECTION_OUT)
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("Could not obtain usb output pipe."));
-
+        UsbEndpoint inEndpoint = usbEndpoints.stream().filter(endpoint -> endpoint.getDirection() == -128).findAny().orElseThrow(() -> new IllegalStateException("Could not obtain usb input pipe."));
+        UsbEndpoint outEndpoint = usbEndpoints.stream().filter(endpoint -> endpoint.getDirection() == 0).findAny().orElseThrow(() -> new IllegalStateException("Could not obtain usb output pipe."));
         UsbPipe usbOutPipe = outEndpoint.getUsbPipe();
         usbOutPipe.open();
 
@@ -296,13 +319,13 @@ public class AntUsbDevice implements Closeable {
         return (UsbInterface) this.device.getActiveUsbConfiguration().getUsbInterfaces().get(0);
     }
 
-    private void closeChannel(byte channelNumber) throws AntException {
+    public void closeChannel(byte channelNumber) throws AntException {
         UnassignChannelMessage unassignChannelMessage = new UnassignChannelMessage(channelNumber);
         ChannelEventOrResponseMessage unassignResponseMsg = (ChannelEventOrResponseMessage) sendBlocking(unassignChannelMessage);
         if (unassignResponseMsg.getResponseCode() != ChannelEventResponseCode.RESPONSE_NO_ERROR) {
-            LOG.debug(() -> format("Received unexpected message %s. Halting program.", unassignResponseMsg));
+            LOG.debug(() -> String.format("Received unexpected message %s. Halting program.", unassignResponseMsg));
             throw new AntException("Could not close channel " + channelNumber);
         }
-        LOG.debug(() -> format("Successfully unassigned channel %s.", channelNumber));
+        LOG.debug(() -> String.format("Successfully unassigned channel %s.", channelNumber));
     }
 }

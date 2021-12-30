@@ -5,10 +5,13 @@ import be.glever.ant.channel.AntChannel;
 import be.glever.ant.constants.AntPlusDeviceType;
 import be.glever.ant.message.channel.ChannelEventOrResponseMessage;
 import be.glever.ant.message.channel.ChannelEventResponseCode;
-import be.glever.ant.message.configuration.*;
+import be.glever.ant.message.configuration.AssignChannelMessage;
+import be.glever.ant.message.configuration.ChannelIdMessage;
+import be.glever.ant.message.configuration.ChannelPeriodMessage;
+import be.glever.ant.message.configuration.ChannelRfFrequencyMessage;
+import be.glever.ant.message.configuration.NetworkKeyMessage;
 import be.glever.ant.message.control.OpenChannelMessage;
 import be.glever.ant.usb.AntUsbDevice;
-import be.glever.ant.util.ByteUtils;
 import be.glever.antplus.power.PowerChannel;
 
 import java.util.concurrent.ExecutionException;

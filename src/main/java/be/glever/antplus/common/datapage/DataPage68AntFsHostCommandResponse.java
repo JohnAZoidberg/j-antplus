@@ -1,5 +1,6 @@
 package be.glever.antplus.common.datapage;
 
+import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
 import java.util.Arrays;
 
 public class DataPage68AntFsHostCommandResponse extends AbstractAntPlusDataPage {

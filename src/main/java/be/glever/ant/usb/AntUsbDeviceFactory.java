@@ -1,7 +1,7 @@
 package be.glever.ant.usb;
 
 import be.glever.ant.AntException;
-
+import be.glever.ant.usb.AntUsbDevice;
 import javax.usb.UsbDevice;
 import javax.usb.UsbException;
 import javax.usb.UsbHostManager;

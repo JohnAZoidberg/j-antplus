@@ -6,7 +6,6 @@ import be.glever.ant.message.AntBlockingMessage;
 import be.glever.ant.message.channel.ChannelEventOrResponseMessage;
 
 public class UnassignChannelMessage extends AbstractAntMessage implements AntBlockingMessage {
-
     private byte channelNumber;
 
     public UnassignChannelMessage(byte channelNumber) {

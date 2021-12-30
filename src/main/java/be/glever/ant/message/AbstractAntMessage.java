@@ -1,12 +1,18 @@
 package be.glever.ant.message;
 
 import be.glever.ant.AntException;
+import be.glever.ant.channel.AntChannelId;
+import be.glever.ant.channel.AntChannelTransmissionType;
+import be.glever.ant.constants.AntPlusDeviceType;
+import be.glever.ant.message.AntMessage;
+import be.glever.ant.message.Rssi;
 import be.glever.ant.util.ByteArrayBuilder;
 import be.glever.ant.util.ByteUtils;
 
 import java.util.Arrays;
 
 public abstract class AbstractAntMessage implements AntMessage {
+    private byte[] bytes;
 
     public abstract byte[] getMessageContent();
 
@@ -31,6 +37,7 @@ public abstract class AbstractAntMessage implements AntMessage {
 
     @Override
     public void parse(byte[] bytes) throws AntException {
+        this.bytes = bytes;
         validateNumberDataBytes(bytes);
         validateChecksum(bytes);
         setMessageBytes(Arrays.copyOfRange(bytes, 3, bytes.length - 1));
@@ -60,9 +67,48 @@ public abstract class AbstractAntMessage implements AntMessage {
     private void validateNumberDataBytes(byte[] bytes) throws AntException {
         byte nrDataBytes = bytes[1];
         if (nrDataBytes + 4 != bytes.length) {
-            throw new AntException("Incorrect message length given [" + nrDataBytes + "] for byte array "
-                    + ByteUtils.hexString(bytes));
+            throw new AntException("Incorrect message length given [" + nrDataBytes + "] for byte array " + ByteUtils.hexString(bytes));
         }
     }
 
+    // TODO: Need to turn most of these numbers to hex
+    public Object getExtendedData() {
+        byte contentByteSize = this.bytes[1];
+        if (contentByteSize > 9) {
+            int flagByte = this.bytes[12] & 0xFF;
+            switch (flagByte) {
+                case 128: {
+                    return this.bytesToChannelId(Arrays.copyOfRange(this.bytes, 13, 17));
+                }
+                case 64: {
+                    return this.bytesToRssi(Arrays.copyOfRange(this.bytes, 13, 16));
+                }
+                case 32: {
+                    return ByteUtils.toInt(this.bytes[13], this.bytes[14]);
+                }
+                case 224: {
+                    return null;
+                }
+                case 160: {
+                    return null;
+                }
+                case 96: {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    private AntChannelId bytesToChannelId(byte[] bytes) throws AntException {
+        AntPlusDeviceType deviceType = AntPlusDeviceType.valueOf(bytes[2]).orElseThrow(() -> new AntException("Standard message does not have extended data"));
+        return new AntChannelId(new AntChannelTransmissionType(bytes[3]), deviceType, Arrays.copyOfRange(bytes, 0, 2));
+    }
+
+    private Rssi bytesToRssi(byte[] bytes) {
+        if (bytes[0] != 32) {
+            return null;
+        }
+        return new Rssi(bytes[1], bytes[2]);
+    }
 }

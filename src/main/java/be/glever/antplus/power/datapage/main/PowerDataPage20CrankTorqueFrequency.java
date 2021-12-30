@@ -1,7 +1,6 @@
 package be.glever.antplus.power.datapage.main;
 
 import be.glever.ant.util.ByteUtils;
-import be.glever.antplus.power.PedalPower;
 import be.glever.antplus.power.datapage.AbstractPowerDataPage;
 
 /**
@@ -39,8 +38,7 @@ public class PowerDataPage20CrankTorqueFrequency extends AbstractPowerDataPage {
      * Rollover: 32.7
      */
     public double getTimeStamp() {
-        // TODO: Convert to double
-        return ByteUtils.fromUShort(getPageSpecificBytes()[4], getPageSpecificBytes()[3]);
+        return (double)ByteUtils.fromUShort(this.getPageSpecificBytes()[4], this.getPageSpecificBytes()[3]) / 2000.0;
     }
 
     /**

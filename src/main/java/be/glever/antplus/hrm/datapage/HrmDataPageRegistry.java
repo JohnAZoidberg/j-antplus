@@ -2,7 +2,11 @@ package be.glever.antplus.hrm.datapage;
 
 import be.glever.antplus.common.datapage.registry.AbstractDataPageRegistry;
 import be.glever.antplus.common.datapage.registry.CommonDataPageRegistry;
-import be.glever.antplus.hrm.datapage.background.*;
+import be.glever.antplus.hrm.datapage.background.HrmDataPage1CumulativeOperatingTime;
+import be.glever.antplus.hrm.datapage.background.HrmDataPage2ManufacturerInformation;
+import be.glever.antplus.hrm.datapage.background.HrmDataPage3ProductInformation;
+import be.glever.antplus.hrm.datapage.background.HrmDataPage6Capabilities;
+import be.glever.antplus.hrm.datapage.background.HrmDataPage7BatteryStatus;
 import be.glever.antplus.hrm.datapage.main.HrmDataPage0Default;
 import be.glever.antplus.hrm.datapage.main.HrmDataPage4PreviousHeartBeatEvent;
 import be.glever.antplus.hrm.datapage.main.HrmDataPage5SwimIntervalSummary;

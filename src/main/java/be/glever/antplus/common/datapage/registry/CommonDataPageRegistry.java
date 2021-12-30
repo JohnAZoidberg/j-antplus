@@ -1,31 +1,43 @@
 package be.glever.antplus.common.datapage.registry;
 
-import be.glever.antplus.common.datapage.*;
+import be.glever.antplus.common.datapage.DataPage67AntFsClientBeacon;
+import be.glever.antplus.common.datapage.DataPage68AntFsHostCommandResponse;
+import be.glever.antplus.common.datapage.DataPage70Request;
+import be.glever.antplus.common.datapage.DataPage71CommandStatus;
+import be.glever.antplus.common.datapage.DataPage73GenericCommand;
+import be.glever.antplus.common.datapage.DataPage74OpenChannelCommand;
+import be.glever.antplus.common.datapage.DataPage76ModeSettingsCommand;
+import be.glever.antplus.common.datapage.DataPage78MultiComponentSystemManufacturersInformation;
+import be.glever.antplus.common.datapage.DataPage79MultiComponentSystemProductInformation;
+import be.glever.antplus.common.datapage.DataPage80ManufacturersInformation;
+import be.glever.antplus.common.datapage.DataPage81ProductInformation;
+import be.glever.antplus.common.datapage.DataPage82BatteryStatus;
+import be.glever.antplus.common.datapage.DataPage83TimeAndDate;
+import be.glever.antplus.common.datapage.DataPage84SubfieldData;
+import be.glever.antplus.common.datapage.DataPage85MemoryLevel;
+import be.glever.antplus.common.datapage.DataPage86GetPairedDevices;
+import be.glever.antplus.common.datapage.DataPage87ErrorDescription;
+import be.glever.antplus.common.datapage.registry.AbstractDataPageRegistry;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class CommonDataPageRegistry extends AbstractDataPageRegistry {
-
-    private Map<Byte, Class<? extends AbstractAntPlusDataPage>> registry = new HashMap<>();
-
+public class CommonDataPageRegistry
+extends AbstractDataPageRegistry {
     public CommonDataPageRegistry() {
-        add(DataPage67AntFsClientBeacon.PAGE_NR, DataPage67AntFsClientBeacon::new);
-        add(DataPage68AntFsHostCommandResponse.PAGE_NR, DataPage68AntFsHostCommandResponse::new);
-        add(DataPage70Request.PAGE_NR, DataPage70Request::new);
-        add(DataPage71CommandStatus.PAGE_NR, DataPage71CommandStatus::new);
-        add(DataPage73GenericCommand.PAGE_NR, DataPage73GenericCommand::new);
-        add(DataPage74OpenChannelCommand.PAGE_NR, DataPage74OpenChannelCommand::new);
-        add(DataPage76ModeSettingsCommand.PAGE_NR, DataPage76ModeSettingsCommand::new);
-        add(DataPage78MultiComponentSystemManufacturersInformation.PAGE_NR, DataPage78MultiComponentSystemManufacturersInformation::new);
-        add(DataPage79MultiComponentSystemProductInformation.PAGE_NR, DataPage79MultiComponentSystemProductInformation::new);
-        add(DataPage80ManufacturersInformation.PAGE_NR, DataPage80ManufacturersInformation::new);
-        add(DataPage81ProductInformation.PAGE_NR, DataPage81ProductInformation::new);
-        add(DataPage82BatteryStatus.PAGE_NR, DataPage82BatteryStatus::new);
-        add(DataPage83TimeAndDate.PAGE_NR, DataPage83TimeAndDate::new);
-        add(DataPage84SubfieldData.PAGE_NR, DataPage84SubfieldData::new);
-        add(DataPage85MemoryLevel.PAGE_NR, DataPage85MemoryLevel::new);
-        add(DataPage86GetPairedDevices.PAGE_NR, DataPage86GetPairedDevices::new);
-        add(DataPage87ErrorDescription.PAGE_NR, DataPage87ErrorDescription::new);
+        this.add((byte)67, DataPage67AntFsClientBeacon::new);
+        this.add((byte)68, DataPage68AntFsHostCommandResponse::new);
+        this.add((byte)70, DataPage70Request::new);
+        this.add((byte)71, DataPage71CommandStatus::new);
+        this.add((byte)73, DataPage73GenericCommand::new);
+        this.add((byte)74, DataPage74OpenChannelCommand::new);
+        this.add((byte)76, DataPage76ModeSettingsCommand::new);
+        this.add((byte)78, DataPage78MultiComponentSystemManufacturersInformation::new);
+        this.add((byte)79, DataPage79MultiComponentSystemProductInformation::new);
+        this.add((byte)80, DataPage80ManufacturersInformation::new);
+        this.add((byte)81, DataPage81ProductInformation::new);
+        this.add((byte)82, DataPage82BatteryStatus::new);
+        this.add((byte)83, DataPage83TimeAndDate::new);
+        this.add((byte)84, DataPage84SubfieldData::new);
+        this.add((byte)85, DataPage85MemoryLevel::new);
+        this.add((byte)86, DataPage86GetPairedDevices::new);
+        this.add((byte)87, DataPage87ErrorDescription::new);
     }
 }

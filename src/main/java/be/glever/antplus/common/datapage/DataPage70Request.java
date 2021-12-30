@@ -1,7 +1,8 @@
 package be.glever.antplus.common.datapage;
 
-public class DataPage70Request extends AbstractAntPlusDataPage {
+import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
 
+public class DataPage70Request extends AbstractAntPlusDataPage {
     public static final byte PAGE_NR = 70;
 
     public DataPage70Request(byte[] dataPageBytes) {
@@ -47,5 +48,22 @@ public class DataPage70Request extends AbstractAntPlusDataPage {
     @Override
     public byte getPageNumber() {
         return PAGE_NR;
+    }
+
+    public static enum CommandType {
+        REQUEST_DATA_PAGE((byte) 1),
+        REQUEST_ANTFS_SESSION((byte) 2),
+        REQUEST_DATA_PAGE_FROM_SLAVE((byte) 3),
+        REQUEST_DATA_PAGE_SET((byte) 4);
+
+        private byte value;
+
+        private CommandType(byte value) {
+            this.value = value;
+        }
+
+        public byte value() {
+            return this.value;
+        }
     }
 }

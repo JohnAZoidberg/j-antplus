@@ -3,11 +3,9 @@ package be.glever.ant.message;
 import be.glever.ant.AntException;
 
 public interface AntMessage {
+    public byte getMessageId();
 
-    byte getMessageId();
+    public void parse(byte[] value) throws AntException;
 
-    void parse(byte[] bytes) throws AntException;
-
-    byte[] toByteArray();
-
+    public byte[] toByteArray();
 }

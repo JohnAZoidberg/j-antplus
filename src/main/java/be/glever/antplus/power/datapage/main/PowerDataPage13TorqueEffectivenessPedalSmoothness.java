@@ -1,6 +1,5 @@
 package be.glever.antplus.power.datapage.main;
 
-import be.glever.ant.util.ByteUtils;
 import be.glever.antplus.power.datapage.AbstractPowerDataPage;
 
 /**
@@ -28,7 +27,7 @@ public class PowerDataPage13TorqueEffectivenessPedalSmoothness extends AbstractP
      * Range: 0-100%
      */
     public int getLeftTorqueEffectiveness() {
-        return getPageSpecificBytes()[1];
+        return this.getPageSpecificBytes()[1] & 0xFF;
     }
 
     /**
@@ -38,7 +37,7 @@ public class PowerDataPage13TorqueEffectivenessPedalSmoothness extends AbstractP
      * Range: 0-100%
      */
     public int getRightTorqueEffectiveness() {
-        return getPageSpecificBytes()[2];
+        return this.getPageSpecificBytes()[2] & 0xFF;
     }
 
     /**
@@ -61,7 +60,7 @@ public class PowerDataPage13TorqueEffectivenessPedalSmoothness extends AbstractP
      * Range: 0-100%
      */
     public int getRightPedalSmoothness() {
-        return getPageSpecificBytes()[4];
+        return this.getPageSpecificBytes()[4] & 0xFF;
     }
 
     /**
@@ -71,10 +70,10 @@ public class PowerDataPage13TorqueEffectivenessPedalSmoothness extends AbstractP
      * Range: 0-100%
      */
     public int getCombinedPedalSmoothness() {
-        if (getRightPedalSmoothness() != 0xFF)
-            return 0xFF;
-
-        return getPageSpecificBytes()[3];
+        if (this.getRightPedalSmoothness() != 255) {
+            return 255;
+        }
+        return this.getPageSpecificBytes()[3] & 0xFF;
     }
 
     @Override

@@ -2,8 +2,6 @@ package be.glever.ant.util;
 
 import be.glever.util.logging.Log;
 
-import static java.lang.String.format;
-
 public class ByteUtils {
     private static final Log LOG = Log.getLogger(ByteUtils.class);
 
@@ -25,7 +23,7 @@ public class ByteUtils {
             } else {
                 sb.append('-');
             }
-            sb.append(format("%02X", (0xFF & bite)));
+            sb.append(String.format("%02X", (0xFF & bite)));
         }
         return sb.toString();
     }
@@ -61,9 +59,7 @@ public class ByteUtils {
      * @param val
      */
     public static byte[] toUShort(int val) {
-        byte[] ret = new byte[2];
-        ret[0] = (byte) val;
-        ret[1] = (byte) (val >> 8);
+        byte[] ret = new byte[]{(byte)val, (byte)(val >> 8)};
         return ret;
     }
 
@@ -84,7 +80,7 @@ public class ByteUtils {
             val |= bytes[i - 1] & 0xff;
         }
         int finalVal = val;
-        LOG.debug(() -> format("decoded %s to unsigned int %s", ByteUtils.hexString(bytes), finalVal));
+        LOG.debug(() -> String.format("decoded %s to unsigned int %s", ByteUtils.hexString(bytes), finalVal));
         return val;
     }
 }

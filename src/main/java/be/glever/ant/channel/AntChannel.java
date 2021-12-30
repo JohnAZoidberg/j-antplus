@@ -1,5 +1,7 @@
 package be.glever.ant.channel;
 
+import be.glever.ant.channel.AntChannelId;
+import be.glever.ant.channel.AntChannelNetwork;
 import be.glever.ant.constants.AntChannelType;
 import be.glever.ant.message.AntMessage;
 import reactor.core.publisher.Flux;
@@ -69,7 +71,7 @@ public abstract class AntChannel {
         this.network = network;
     }
 
-    protected byte getChannelNumber() {
+    public byte getChannelNumber() {
         return this.channelNumber;
     }
 
