@@ -2,7 +2,6 @@ package be.glever.antplus.common.datapage;
 
 import be.glever.ant.util.ByteUtils;
 import be.glever.antplus.BatteryStatus;
-import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
 
 public class DataPage82BatteryStatus extends AbstractAntPlusDataPage {
     public static final byte PAGE_NR = 82;
@@ -50,19 +49,19 @@ public class DataPage82BatteryStatus extends AbstractAntPlusDataPage {
     }
 
     public BatteryStatus getBatteryStatus() {
-        switch (this.getDescriptiveBitField() >> 4 & 7) {
-            case 0:
-            case 6:
+        switch (this.getDescriptiveBitField() >> 4 & 0b111) {
+            case 0x00:
+            case 0x06:
                 return BatteryStatus.RESERVED;
-            case 1:
+            case 0x01:
                 return BatteryStatus.NEW;
-            case 2:
+            case 0x02:
                 return BatteryStatus.GOOD;
-            case 3:
+            case 0x03:
                 return BatteryStatus.OK;
-            case 4:
+            case 0x04:
                 return BatteryStatus.LOW;
-            case 5:
+            case 0x05:
                 return BatteryStatus.CRITICAL;
             default:
                 return BatteryStatus.INVALID;

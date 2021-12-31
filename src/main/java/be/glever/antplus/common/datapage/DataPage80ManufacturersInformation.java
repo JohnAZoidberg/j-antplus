@@ -1,10 +1,8 @@
 package be.glever.antplus.common.datapage;
 
 import be.glever.ant.util.ByteUtils;
-import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
 
-public class DataPage80ManufacturersInformation
-extends AbstractAntPlusDataPage {
+public class DataPage80ManufacturersInformation extends AbstractAntPlusDataPage {
     public static final byte PAGE_NR = 80;
 
     public DataPage80ManufacturersInformation(byte[] dataPageBytes) {

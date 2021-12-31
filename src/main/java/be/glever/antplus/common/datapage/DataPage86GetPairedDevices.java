@@ -1,9 +1,6 @@
 package be.glever.antplus.common.datapage;
 
-import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
-
-public class DataPage86GetPairedDevices
-extends AbstractAntPlusDataPage {
+public class DataPage86GetPairedDevices extends AbstractAntPlusDataPage {
     public static final byte PAGE_NR = 86;
 
     public DataPage86GetPairedDevices(byte[] dataPageBytes) {

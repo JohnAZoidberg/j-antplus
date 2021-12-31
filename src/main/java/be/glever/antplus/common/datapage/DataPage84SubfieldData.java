@@ -1,9 +1,6 @@
 package be.glever.antplus.common.datapage;
 
-import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
-
-public class DataPage84SubfieldData
-extends AbstractAntPlusDataPage {
+public class DataPage84SubfieldData extends AbstractAntPlusDataPage {
     public static final byte PAGE_NR = 84;
 
     public DataPage84SubfieldData(byte[] dataPageBytes) {

@@ -17,6 +17,8 @@ public class SetLowPrioritySearchTimeoutMessage extends AbstractAntMessage imple
 
     @Override
     public byte getMessageId() {
+        // TODO: This was changed in the import from jar
+        // Previously it was 0x44. Not sure which is correct.
         return 0x41;
     }
 

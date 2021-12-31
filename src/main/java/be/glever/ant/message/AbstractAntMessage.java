@@ -67,7 +67,8 @@ public abstract class AbstractAntMessage implements AntMessage {
     private void validateNumberDataBytes(byte[] bytes) throws AntException {
         byte nrDataBytes = bytes[1];
         if (nrDataBytes + 4 != bytes.length) {
-            throw new AntException("Incorrect message length given [" + nrDataBytes + "] for byte array " + ByteUtils.hexString(bytes));
+            throw new AntException("Incorrect message length given [" + nrDataBytes + "] for byte array "
+                    + ByteUtils.hexString(bytes));
         }
     }
 

@@ -1,6 +1,5 @@
 package be.glever.antplus.common.datapage;
 
-import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
 import java.util.Arrays;
 
 public class DataPage67AntFsClientBeacon extends AbstractAntPlusDataPage {

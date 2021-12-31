@@ -1,7 +1,6 @@
 package be.glever.antplus.common.datapage;
 
 import be.glever.ant.util.ByteUtils;
-import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
 import java.util.Arrays;
 
 public class DataPage71CommandStatus extends AbstractAntPlusDataPage {
@@ -27,22 +26,22 @@ public class DataPage71CommandStatus extends AbstractAntPlusDataPage {
 
     public CommandStatus getCommandStatus() {
         switch (ByteUtils.toInt(getDataPageBytes()[3])) {
-            case 0: {
+            case 0x00: {
                 return CommandStatus.PASS;
             }
-            case 1: {
+            case 0x01: {
                 return CommandStatus.FAIL;
             }
-            case 2: {
+            case 0x02: {
                 return CommandStatus.NOT_SUPPORTED;
             }
-            case 3: {
+            case 0x03: {
                 return CommandStatus.REJECTED;
             }
-            case 4: {
+            case 0x04: {
                 return CommandStatus.PENDING;
             }
-            case 255: {
+            case 0xFF: {
                 return CommandStatus.UNINITIALIZED;
             }
         }

@@ -88,9 +88,9 @@ public class AntUsbDevice implements Closeable {
     }
 
     public void initialize() throws AntException {
-        if (isInitialized) {
+        if (isInitialized)
             return;
-        }
+
         try {
             initUsbInterface();
             initAntDevice();
@@ -101,7 +101,7 @@ public class AntUsbDevice implements Closeable {
     }
 
     public boolean isInitialized() {
-        return this.isInitialized;
+        return isInitialized;
     }
 
     @Override
@@ -113,7 +113,7 @@ public class AntUsbDevice implements Closeable {
             LOG.error(() -> "Reset ant stick failed. Continuing with shutdown of usb interface.", e);
         }
         try {
-            antUsbReader.stop();
+            this.antUsbReader.stop();
             UsbInterface activeUsbInterface = getActiveUsbInterface();
             if (activeUsbInterface.isClaimed()) {
                 activeUsbInterface.release();
@@ -131,7 +131,7 @@ public class AntUsbDevice implements Closeable {
         int maxChannels = this.capabilities.getMaxChannels();
         for (int i = 0; i < maxChannels; i++) {
             RequestMessage requestMessage = new RequestMessage((byte) i, ChannelStatusMessage.MSG_ID);
-            ChannelStatusMessage responseMessage = (ChannelStatusMessage) this.sendBlocking(requestMessage);
+            ChannelStatusMessage responseMessage = (ChannelStatusMessage) sendBlocking(requestMessage);
             byte channelNumber = responseMessage.getChannelNumber();
             ChannelStatusMessage.CHANNEL_STATUS channelStatus = responseMessage.getChannelStatus();
             LOG.debug(() -> String.format("Channel %s is in state %s.", channelNumber, channelStatus));
@@ -139,7 +139,7 @@ public class AntUsbDevice implements Closeable {
                 case UnAssigned:
                     break;
                 case Assigned:
-                    this.closeChannel(channelNumber);
+                    closeChannel(channelNumber);
                     break;
                 default:
                     throw new AntException("Don't know (yet) how to close channel in current state " + channelStatus + ".");
