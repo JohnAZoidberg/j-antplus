@@ -74,30 +74,27 @@ public abstract class AbstractAntMessage implements AntMessage {
     // TODO: Need to turn most of these numbers to hex
     public Object getExtendedData() {
         byte contentByteSize = this.bytes[1];
-        if (contentByteSize > 9) {
-            int flagByte = this.bytes[12] & 0xFF;
-            switch (flagByte) {
-                case 128: {
-                    return this.bytesToChannelId(Arrays.copyOfRange(this.bytes, 13, 17));
-                }
-                case 64: {
-                    return this.bytesToRssi(Arrays.copyOfRange(this.bytes, 13, 16));
-                }
-                case 32: {
-                    return ByteUtils.toInt(this.bytes[13], this.bytes[14]);
-                }
-                case 224: {
-                    return null;
-                }
-                case 160: {
-                    return null;
-                }
-                case 96: {
-                    return null;
-                }
-            }
+        if (contentByteSize < 10) {
+            return null;
         }
-        return null;
+
+        int flagByte = this.bytes[12] & 0xFF;
+        switch (flagByte) {
+            case 0x80:
+                return this.bytesToChannelId(Arrays.copyOfRange(this.bytes, 13, 17)); // 4 bytes
+            case 0x40:
+                return this.bytesToRssi(Arrays.copyOfRange(this.bytes, 13, 16)); // 3 bytes
+            case 0x20:
+                return ByteUtils.toInt(this.bytes[13], this.bytes[14]);
+            case 0xE0:
+                return null;
+            case 0xA0:
+                return null;
+            case 0x60:
+                return null;
+            default:
+                return null;
+        }
     }
 
     private AntChannelId bytesToChannelId(byte[] bytes) throws AntException {
