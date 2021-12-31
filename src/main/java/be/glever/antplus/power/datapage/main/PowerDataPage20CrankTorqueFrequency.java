@@ -38,7 +38,7 @@ public class PowerDataPage20CrankTorqueFrequency extends AbstractPowerDataPage {
      * Rollover: 32.7
      */
     public double getTimeStamp() {
-        return (double)ByteUtils.fromUShort(this.getPageSpecificBytes()[4], this.getPageSpecificBytes()[3]) / 2000.0;
+        return (double)ByteUtils.fromUShort(getPageSpecificBytes()[4], getPageSpecificBytes()[3]) / 2000.0;
     }
 
     /**

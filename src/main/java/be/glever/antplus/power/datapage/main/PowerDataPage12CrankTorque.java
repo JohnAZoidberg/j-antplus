@@ -24,7 +24,7 @@ public class PowerDataPage12CrankTorque extends AbstractPowerDataPage {
      * Rollover: 256
      */
     public int getCrankRevolutions() {
-        return this.getPageSpecificBytes()[1] & 0xFF;
+        return getPageSpecificBytes()[1] & 0xFF;
     }
 
     /**
@@ -33,7 +33,7 @@ public class PowerDataPage12CrankTorque extends AbstractPowerDataPage {
      * Range: 0 - 254 RPM
      */
     public int getInstantaneousCadence() {
-        return this.getPageSpecificBytes()[2] & 0xFF;
+        return getPageSpecificBytes()[2] & 0xFF;
     }
 
     /**

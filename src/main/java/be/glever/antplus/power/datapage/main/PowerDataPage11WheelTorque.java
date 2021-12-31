@@ -25,7 +25,7 @@ public class PowerDataPage11WheelTorque extends AbstractPowerDataPage {
      * Rollover: 256
      */
     public int getWheelRevolutions() {
-        return this.getPageSpecificBytes()[1] & 0xFF;
+        return getPageSpecificBytes()[1] & 0xFF;
     }
 
     /**
@@ -34,7 +34,7 @@ public class PowerDataPage11WheelTorque extends AbstractPowerDataPage {
      * Range: 0 - 254 RPM
      */
     public int getInstantaneousCadence() {
-        return this.getPageSpecificBytes()[2] & 0xFF;
+        return getPageSpecificBytes()[2] & 0xFF;
     }
 
     /**
@@ -42,7 +42,7 @@ public class PowerDataPage11WheelTorque extends AbstractPowerDataPage {
      * Unit: 1/2048s
      */
     public double getWheelPeriod() {
-        byte[] pageBytes = this.getPageSpecificBytes();
+        byte[] pageBytes = getPageSpecificBytes();
         return (double)ByteUtils.fromUShort(pageBytes[3], pageBytes[4]) / 2048.0;
     }
 
@@ -51,7 +51,7 @@ public class PowerDataPage11WheelTorque extends AbstractPowerDataPage {
      * Unit: 1/32Nm
      */
     public double getAccumulatedTorque() {
-        byte[] pageBytes = this.getPageSpecificBytes();
+        byte[] pageBytes = getPageSpecificBytes();
         return (double)ByteUtils.fromUShort(pageBytes[5], pageBytes[6]) / 32.0;
     }
 

@@ -15,6 +15,11 @@ public class SpeedCadenceDataPage4BatteryStatus extends AbstractSpeedCadenceData
         return PAGE_NR;
     }
 
+    /**
+     * Range: 0-255
+     * Unit: 1/256 V
+     * @return fractional battery voltage.
+     */
     public double getFractionalBatteryVoltage() {
         int batteryLevelByte = this.getPageSpecificBytes()[0] & 0xFF;
         if (batteryLevelByte == 255) {
