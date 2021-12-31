@@ -1,6 +1,7 @@
 package be.glever.ant.channel;
 
 import be.glever.ant.channel.SharedAddressIndicator;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class AntChannelTransmissionType {
     private byte value;
@@ -10,15 +11,21 @@ public class AntChannelTransmissionType {
      */
     public static final AntChannelTransmissionType PAIRING_TRANSMISSION_TYPE = new AntChannelTransmissionType((byte) 0, (byte) 0, (byte) 0);
 
-    // TODO
-    //@Override
-    //public boolean equals(Object obj) {
-    //    if (!(obj instanceof AntChannelTransmissionType)) {
-    //        return false;
-    //    }
-    //    AntChannelTransmissionType other = (AntChannelTransmissionType)obj;
-    //    return this.value == other.value;
-    //}
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AntChannelTransmissionType)) {
+            return false;
+        }
+        AntChannelTransmissionType other = (AntChannelTransmissionType)obj;
+        return this.value == other.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).
+          append(value).
+          toHashCode();
+    }
 
     public AntChannelTransmissionType(byte value) {
         this.value = value;
