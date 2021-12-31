@@ -88,15 +88,14 @@ public class AntUsbDevice implements Closeable {
     }
 
     public void initialize() throws AntException {
-        if (this.isInitialized) {
+        if (isInitialized) {
             return;
         }
         try {
-            this.initUsbInterface();
-            this.initAntDevice();
-            this.isInitialized = true;
-        }
-        catch (Exception e) {
+            initUsbInterface();
+            initAntDevice();
+            isInitialized = true;
+        } catch (Exception e) {
             throw new AntException(e);
         }
     }
@@ -108,50 +107,48 @@ public class AntUsbDevice implements Closeable {
     @Override
     public void close() throws IOException {
         try {
-            this.resetUsbDevice();
-            this.isInitialized = false;
-        }
-        catch (Exception e) {
+            resetUsbDevice();
+            isInitialized = false;
+        } catch (Exception e) {
             LOG.error(() -> "Reset ant stick failed. Continuing with shutdown of usb interface.", e);
         }
         try {
-            this.antUsbReader.stop();
-            UsbInterface activeUsbInterface = this.getActiveUsbInterface();
+            antUsbReader.stop();
+            UsbInterface activeUsbInterface = getActiveUsbInterface();
             if (activeUsbInterface.isClaimed()) {
                 activeUsbInterface.release();
             }
-            this.isInitialized = false;
-        }
-        catch (Exception e) {
+            isInitialized = false;
+        } catch (Exception e) {
             throw new IOException(e.getMessage(), e);
         }
     }
 
+    /**
+     * Closes any channel still open between the transceiver and ANT devices.
+     */
     public void closeAllChannels() throws AntException {
         int maxChannels = this.capabilities.getMaxChannels();
-        block4: for (int i = 0; i < maxChannels; i++) {
-            RequestMessage requestMessage = new RequestMessage((byte)i, (byte) 82);
-            ChannelStatusMessage responseMessage = (ChannelStatusMessage)this.sendBlocking(requestMessage);
+        for (int i = 0; i < maxChannels; i++) {
+            RequestMessage requestMessage = new RequestMessage((byte) i, ChannelStatusMessage.MSG_ID);
+            ChannelStatusMessage responseMessage = (ChannelStatusMessage) this.sendBlocking(requestMessage);
             byte channelNumber = responseMessage.getChannelNumber();
             ChannelStatusMessage.CHANNEL_STATUS channelStatus = responseMessage.getChannelStatus();
-            LOG.debug(() -> String.format("Channel %s is in state %s.", new Object[]{channelNumber, channelStatus}));
+            LOG.debug(() -> String.format("Channel %s is in state %s.", channelNumber, channelStatus));
             switch (channelStatus) {
-                case UnAssigned: {
-                    continue block4;
-                }
-                case Assigned: {
+                case UnAssigned:
+                    break;
+                case Assigned:
                     this.closeChannel(channelNumber);
-                    continue block4;
-                }
-                default: {
+                    break;
+                default:
                     throw new AntException("Don't know (yet) how to close channel in current state " + channelStatus + ".");
-                }
             }
         }
     }
 
     public AntUsbDeviceCapabilities getCapabilities() {
-        return this.capabilities;
+        return capabilities;
     }
 
     public Mono<Void> openChannel(AntChannel channel) {
@@ -206,20 +203,25 @@ public class AntUsbDevice implements Closeable {
      * @param requestMessage The message to send.
      */
     public Mono<AntMessage> send(AntMessage requestMessage, BiFunction<AntMessage, AntMessage, Boolean> responseFilter) {
-        Flux response = this.antMessageProcessor.filter(responseMessage -> (Boolean)responseFilter.apply(requestMessage, (AntMessage)responseMessage)).concatMap(AntUsbDevice::mapToErrorIfRequired);
-        Mono messageSender = Mono.fromRunnable(() -> this.antUsbWriter.write(requestMessage));
+        Flux<AntMessage> response = this.antMessageProcessor
+                .filter(responseMessage -> (Boolean)responseFilter.apply(requestMessage, (AntMessage)responseMessage))
+                .concatMap(AntUsbDevice::mapToErrorIfRequired);
+        Mono<Void> messageSender = Mono.fromRunnable(() -> this.antUsbWriter.write(requestMessage));
         return Flux.merge(response, messageSender).map(antMessage -> (AntMessage)antMessage).next();
     }
 
     @Deprecated
     public AntMessage sendBlocking(AntBlockingMessage requestMessage, BiFunction<AntMessage, AntMessage, Boolean> responseValidator) {
-        Flux response = this.antMessageProcessor.filter(responseMessage -> RequestMatcher.isMatchingResponse(requestMessage, responseMessage)).concatMap(AntUsbDevice::mapToErrorIfRequired).take(1L);
-        Mono messageSender = Mono.fromRunnable(() -> this.antUsbWriter.write(requestMessage));
-        AntMessage responseMessage2 = (AntMessage)Flux.merge(response, messageSender).blockFirst(Duration.ofSeconds(10L));
-        if (!responseValidator.apply(requestMessage, responseMessage2).booleanValue()) {
+        Flux<AntMessage> response = this.antMessageProcessor
+                .filter(responseMessage -> RequestMatcher.isMatchingResponse(requestMessage, responseMessage))
+                .concatMap(AntUsbDevice::mapToErrorIfRequired)
+                .take(1);
+        Mono<Void> messageSender = Mono.fromRunnable(() -> this.antUsbWriter.write(requestMessage));
+        AntMessage responseMessage = (AntMessage)Flux.merge(response, messageSender).blockFirst(Duration.ofSeconds(10));
+        if (!responseValidator.apply(requestMessage, responseMessage).booleanValue()) {
             throw new IllegalStateException("Message wasn't responded properly to");
         }
-        return responseMessage2;
+        return responseMessage;
     }
 
     /**
@@ -231,9 +233,12 @@ public class AntUsbDevice implements Closeable {
      */
     @Deprecated
     public AntMessage sendBlocking(AntBlockingMessage requestMessage) {
-        Flux response = this.antMessageProcessor.filter(responseMessage -> RequestMatcher.isMatchingResponse(requestMessage, responseMessage)).concatMap(AntUsbDevice::mapToErrorIfRequired).take(1L);
-        Mono messageSender = Mono.fromRunnable(() -> this.antUsbWriter.write(requestMessage));
-        return (AntMessage)Flux.merge(response, messageSender).blockFirst(Duration.ofSeconds(10L));
+        Flux<AntMessage> response = this.antMessageProcessor
+                .filter(responseMessage -> RequestMatcher.isMatchingResponse(requestMessage, responseMessage))
+                .concatMap(AntUsbDevice::mapToErrorIfRequired)
+                .take(1);
+        Mono<Void> messageSender = Mono.fromRunnable(() -> this.antUsbWriter.write(requestMessage));
+        return (AntMessage)Flux.merge(response, messageSender).blockFirst(Duration.ofSeconds(10));
     }
 
     public byte[] getAntVersion() {
@@ -260,9 +265,17 @@ public class AntUsbDevice implements Closeable {
         }
 
         usbInterface.claim(AntUsbDevice::forceClaim);
+        @SuppressWarnings("unchecked")
         List<UsbEndpoint> usbEndpoints = usbInterface.getUsbEndpoints();
-        UsbEndpoint inEndpoint = usbEndpoints.stream().filter(endpoint -> endpoint.getDirection() == -128).findAny().orElseThrow(() -> new IllegalStateException("Could not obtain usb input pipe."));
-        UsbEndpoint outEndpoint = usbEndpoints.stream().filter(endpoint -> endpoint.getDirection() == 0).findAny().orElseThrow(() -> new IllegalStateException("Could not obtain usb output pipe."));
+        UsbEndpoint inEndpoint = usbEndpoints.stream()
+                .filter(endpoint -> endpoint.getDirection() == UsbConst.ENDPOINT_DIRECTION_IN)
+                .findAny()
+                .orElseThrow(() -> new IllegalStateException("Could not obtain usb input pipe."));
+        UsbEndpoint outEndpoint = usbEndpoints.stream()
+                 .filter(endpoint -> endpoint.getDirection() == UsbConst.ENDPOINT_DIRECTION_OUT)
+                 .findAny()
+                 .orElseThrow(() -> new IllegalStateException("Could not obtain usb output pipe."));
+
         UsbPipe usbOutPipe = outEndpoint.getUsbPipe();
         usbOutPipe.open();
 

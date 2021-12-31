@@ -71,7 +71,6 @@ public abstract class AbstractAntMessage implements AntMessage {
         }
     }
 
-    // TODO: Need to turn most of these numbers to hex
     public Object getExtendedData() {
         byte contentByteSize = this.bytes[1];
         if (contentByteSize < 10) {

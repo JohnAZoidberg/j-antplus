@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum ExtendedAssignment {
-    BACKGROUND_SCANNING_ENABLE((byte) 1),
-    FREQUENCY_AGILITY_ENABLE((byte) 4),
-    FASTCHANNEL_INITIATION_ENABLE((byte) 16),
-    ASYNCHRONOUS_TRANSMISSION_ENABLE((byte) 32);
+    BACKGROUND_SCANNING_ENABLE((byte) 0x1),
+    FREQUENCY_AGILITY_ENABLE((byte) 0x4),
+    FASTCHANNEL_INITIATION_ENABLE((byte) 0x10),
+    ASYNCHRONOUS_TRANSMISSION_ENABLE((byte) 0x20);
 
     private byte value;
 

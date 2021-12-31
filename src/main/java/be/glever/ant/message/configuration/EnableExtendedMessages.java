@@ -18,7 +18,7 @@ implements AntBlockingMessage {
 
     @Override
     public byte getMessageId() {
-        return 102;
+        return 0x66;
     }
 
     @Override
@@ -33,6 +33,6 @@ implements AntBlockingMessage {
 
     @Override
     public byte getResponseMessageId() {
-        return 64;
+        return 0x40;
     }
 }

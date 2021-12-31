@@ -6,8 +6,7 @@ import be.glever.ant.message.AntBlockingMessage;
 import be.glever.ant.message.channel.ChannelEventOrResponseMessage;
 import be.glever.ant.util.ByteArrayBuilder;
 
-public class SetLowPrioritySearchTimeoutMessage
-extends AbstractAntMessage implements AntBlockingMessage {
+public class SetLowPrioritySearchTimeoutMessage extends AbstractAntMessage implements AntBlockingMessage {
     private byte channelNumber;
     private int searchTimeout;
 
@@ -23,7 +22,10 @@ extends AbstractAntMessage implements AntBlockingMessage {
 
     @Override
     public byte[] getMessageContent() {
-        return new ByteArrayBuilder().write(this.channelNumber).write((byte)this.searchTimeout).toByteArray();
+        return new ByteArrayBuilder()
+                .write(channelNumber)
+                .write((byte) searchTimeout)
+                .toByteArray();
     }
 
     @Override
