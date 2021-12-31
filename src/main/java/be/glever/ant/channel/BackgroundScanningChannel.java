@@ -39,7 +39,7 @@ extends AntChannel {
         this.setChannelId(new AntChannelId(AntChannelTransmissionType.PAIRING_TRANSMISSION_TYPE, deviceType.value(), DEVICE_NUMBER_WILDCARD));
         this.setRfFrequency(CHANNEL_FREQUENCY);
         this.setChannelPeriod(HRMChannel.CHANNEL_PERIOD);
-        this.device.openBackgroundScanningChannel(this).block(Duration.ofSeconds(10L));
+        this.device.openBackgroundScanningChannel(this).block(Duration.ofSeconds(10));
     }
 
     @Override

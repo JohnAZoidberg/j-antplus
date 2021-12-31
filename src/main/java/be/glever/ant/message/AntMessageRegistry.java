@@ -30,16 +30,63 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Container and factory for all known ANT messages.
+ */
 public class AntMessageRegistry {
     private static final Log LOG = Log.getLogger(AntMessageRegistry.class);
-    private static Map<Byte, Class<? extends AbstractAntMessage>> registry = new HashMap<Byte, Class<? extends AbstractAntMessage>>();
+    private static Map<Byte, Class<? extends AbstractAntMessage>> registry = new HashMap<>();
 
-    public static AntMessage from(byte[] bytes) throws AntException {
-        byte msgLength = (byte)(bytes[1] + 4);
+    static {
+        // configuration
+        add(AssignChannelMessage.class);
+        add(ChannelPeriodMessage.class);
+        add(ChannelRfFrequencyMessage.class);
+        add(SearchTimeoutMessage.class);
+        add(UnassignChannelMessage.class);
+        add(NetworkKeyMessage.class);
+        add(ChannelIdMessage.class);
+
+        // control
+        add(CloseChannelMessage.class);
+        add(OpenChannelMessage.class);
+        add(OpenRxScanModeMessage.class);
+        add(RequestMessage.class);
+        add(ResetSystemMessage.class);
+
+        // data
+
+        // notification
+        add(StartupNotificationMessage.class);
+        add(SerialErrorMessage.class);
+        add(BroadcastDataMessage.class);
+
+        // requested response
+        add(AntVersionMessage.class);
+        add(ChannelStatusMessage.class);
+        add(SerialNumberMessage.class);
+        add(CapabilitiesResponseMessage.class);
+
+        // Channel events
+        add(ChannelEventOrResponseMessage.class);
+    }
+
+    /**
+     * Parses the given bytes into the correct {@link AbstractAntMessage}
+     * implementation. Precondition: the bytes represent 1 valid Ant Message (from
+     * SYNC to checksum).
+     *
+     * @param bytes
+     * @return
+     */
+    public static AntMessage from(final byte[] bytes) throws AntException {
+        byte msgLength = (byte) (bytes[1] + 4);// sync, msglen, msgid and checksum excluded
         byte msgId = bytes[2];
-        byte[] msgBytes = Arrays.copyOf(bytes, (int)msgLength);
+        final byte[] msgBytes = Arrays.copyOf(bytes, msgLength);
+
         Class<? extends AbstractAntMessage> messageClass = registry.get(msgId);
-        AntMessage messageInstance = AntMessageRegistry.getMessageInstance(msgBytes, msgId, messageClass);
+        final AntMessage messageInstance = getMessageInstance(msgBytes, msgId, messageClass);
+
         LOG.debug(() -> String.format("Converted %s to %s", ByteUtils.hexString(msgBytes), messageInstance.getClass().getSimpleName()));
         return messageInstance;
     }
@@ -47,59 +94,38 @@ public class AntMessageRegistry {
     private static AntMessage getMessageInstance(byte[] msgBytes, byte msgId, Class<? extends AbstractAntMessage> messageClass) {
         AntMessage messageInstance;
         if (messageClass == null) {
-            LOG.error(() -> String.format("Could not convert %s to an AntMessage. Bytes received were %s", ByteUtils.hexString(msgId), ByteUtils.hexString(msgBytes)));
+            LOG.error(() -> String.format("Could not convert %s to an AntMessage. Bytes received were %s", ByteUtils.hexString(msgId),
+                    ByteUtils.hexString(msgBytes)));
             messageInstance = new UnknownMessage(msgBytes);
         } else {
-            messageInstance = AntMessageRegistry.instantiate(messageClass);
+            messageInstance = instantiate(messageClass);
             messageInstance.parse(msgBytes);
         }
         return messageInstance;
     }
 
     private static void add(Class<? extends AbstractAntMessage> antMessageImplClass) {
-        byte messageId = AntMessageRegistry.instantiate(antMessageImplClass).getMessageId();
+        byte messageId = instantiate(antMessageImplClass).getMessageId();
         if (registry.containsKey(messageId)) {
             Class<? extends AbstractAntMessage> existingClass = registry.get(messageId);
-            throw new IllegalStateException(String.format("Could not add class %s to registry due to duplicate id %s. Conflicting class: %s", antMessageImplClass, messageId, existingClass));
+            throw new IllegalStateException(
+                    String.format("Could not add class %s to registry due to duplicate id %s. Conflicting class: %s",
+                                  antMessageImplClass, messageId, existingClass));
         }
         registry.put(messageId, antMessageImplClass);
     }
 
     private static AntMessage instantiate(Class<? extends AbstractAntMessage> msgImplClass) {
         try {
-            return msgImplClass.getDeclaredConstructor(new Class[0]).newInstance(new Object[0]);
-        }
-        catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
-            throw new IllegalStateException("Initialization Error. Could not call default constructor on class [" + msgImplClass.getName() + "]");
+            return msgImplClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            throw new IllegalStateException("Initialization Error. Could not call default constructor on class ["
+                    + msgImplClass.getName() + "]");
         }
     }
 
-    static {
-        AntMessageRegistry.add(AssignChannelMessage.class);
-        AntMessageRegistry.add(ChannelPeriodMessage.class);
-        AntMessageRegistry.add(ChannelRfFrequencyMessage.class);
-        AntMessageRegistry.add(SearchTimeoutMessage.class);
-        AntMessageRegistry.add(UnassignChannelMessage.class);
-        AntMessageRegistry.add(NetworkKeyMessage.class);
-        AntMessageRegistry.add(ChannelIdMessage.class);
-        AntMessageRegistry.add(CloseChannelMessage.class);
-        AntMessageRegistry.add(OpenChannelMessage.class);
-        AntMessageRegistry.add(OpenRxScanModeMessage.class);
-        AntMessageRegistry.add(RequestMessage.class);
-        AntMessageRegistry.add(ResetSystemMessage.class);
-        AntMessageRegistry.add(StartupNotificationMessage.class);
-        AntMessageRegistry.add(SerialErrorMessage.class);
-        AntMessageRegistry.add(BroadcastDataMessage.class);
-        AntMessageRegistry.add(AntVersionMessage.class);
-        AntMessageRegistry.add(ChannelStatusMessage.class);
-        AntMessageRegistry.add(SerialNumberMessage.class);
-        AntMessageRegistry.add(CapabilitiesResponseMessage.class);
-        AntMessageRegistry.add(ChannelEventOrResponseMessage.class);
-    }
+    public static class UnknownMessage extends AbstractAntMessage implements AntMessage {
 
-    public static class UnknownMessage
-    extends AbstractAntMessage
-    implements AntMessage {
         private byte[] bytes;
 
         private UnknownMessage(byte[] fullByteArray) {
