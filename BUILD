@@ -24,13 +24,63 @@ java_library(
     ],
 )
 
+# Manual tests that you can use to try out the capabilities
+java_library(
+    name = "test_stat_lib",
+    srcs = glob(["src/test/java/be/glever/anttest/stats/*.java"]),
+    deps = [":j_antplus"],
+)
+# TODO: Use a macro to avoid duplication
+java_binary(
+    name = "CadenceTest",
+    main_class = "be.glever.anttest.CadenceTest_Main",
+    srcs = glob(["src/test/java/be/glever/anttest/CadenceTest_Main.java"]),
+    deps = [":j_antplus", ":test_stat_lib"],
+)
+java_binary(
+    name = "FecTest",
+    main_class = "be.glever.anttest.FecTest_Main",
+    srcs = glob(["src/test/java/be/glever/anttest/FecTest_Main.java"]),
+    deps = [":j_antplus", ":test_stat_lib"],
+)
+java_binary(
+    name = "HrmTest",
+    main_class = "be.glever.anttest.HrmTest_Main",
+    srcs = glob(["src/test/java/be/glever/anttest/HrmTest_Main.java"]),
+    deps = [":j_antplus", ":test_stat_lib"],
+)
+java_binary(
+    name = "PowerTest",
+    main_class = "be.glever.anttest.PowerTest_Main",
+    srcs = glob(["src/test/java/be/glever/anttest/PowerTest_Main.java"]),
+    deps = [":j_antplus", ":test_stat_lib"],
+)
+java_binary(
+    name = "SpeedAndCadenceTest",
+    main_class = "be.glever.anttest.SpeedAndCadenceTest_Main",
+    srcs = glob(["src/test/java/be/glever/anttest/SpeedAndCadenceTest_Main.java"]),
+    deps = [":j_antplus", ":test_stat_lib"],
+)
+java_binary(
+    name = "SpeedCadenceTest",
+    main_class = "be.glever.anttest.SpeedCadenceTest_Main",
+    srcs = glob(["src/test/java/be/glever/anttest/SpeedCadenceTest_Main.java"]),
+    deps = [":j_antplus", ":test_stat_lib"],
+)
+java_binary(
+    name = "SpeedTest",
+    main_class = "be.glever.anttest.SpeedTest_Main",
+    srcs = glob(["src/test/java/be/glever/anttest/SpeedTest_Main.java"]),
+    deps = [":j_antplus", ":test_stat_lib"],
+)
+
+# Automated tests
 java_test(
-    name = "tests",
-    srcs = glob(
-        ["src/test/java/**/*.java"],
-        # Exclude tests that are supposed to be run interactively with hardware
-        exclude = ["src/test/java/**/anttest/**"]
-    ),
+    name = "junit_tests",
+    srcs = glob([
+        "src/test/java/be/glever/ant/**/*.java",
+        "src/test/java/be/glever/AllTests.java",
+    ]),
     test_class = "AllTests",
     deps = [
         "//:testing_deps",

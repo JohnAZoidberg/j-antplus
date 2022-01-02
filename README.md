@@ -85,3 +85,16 @@ Automated unit tests with JUnit:
 ```sh
 bazel test //:tests
 ```
+
+Manual tests with actual hardare, or rather example program.
+
+```sh
+# Depending on your available hardware, choose one of:
+bazel run //:CadenceTest
+bazel run //:FecTest
+bazel run //:HrmTest
+bazel run //:PowerTest
+bazel run //:SpeedAndCadenceTest
+bazel run //:SpeedCadenceTest
+bazel run //:SpeedTest
+```
