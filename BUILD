@@ -13,6 +13,7 @@ java_library(
         "@maven//:org_usb4java_usb4java_javax",
         "@maven//:ch_qos_logback_logback_core",
         "@maven//:ch_qos_logback_logback_classic",
+        "@maven//:org_apache_commons_commons_lang3",
     ],
 )
 

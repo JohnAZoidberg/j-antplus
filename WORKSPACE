@@ -36,6 +36,7 @@ maven_install(
         "org.usb4java:usb4java-javax:1.3.0",
         "ch.qos.logback:logback-core:1.2.3",
         "ch.qos.logback:logback-classic:1.2.3",
+        "org.apache.commons:commons-lang3:3.8.1",
         "junit:junit:4.13", # Only for testing
     ],
     repositories = [
