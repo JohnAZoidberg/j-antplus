@@ -13,6 +13,7 @@ import be.glever.antplus.speedcadence.datapage.SpeedCadenceDataPageRegistry;
 import be.glever.antplus.speedcadence.datapage.main.SpeedAndCadenceDataPage0Default;
 import be.glever.antplus.speedcadence.datapage.main.SpeedCadenceDataPage5Motion;
 import be.glever.util.logging.Log;
+import be.glever.ant.util.ByteUtils;
 
 import java.io.IOException;
 import java.nio.channels.Channel;
@@ -53,8 +54,8 @@ public class CadenceTest_Main {
             //LOG.debug(() -> "Received datapage " + dataPage.toString());
             if (dataPage instanceof DataPage78MultiComponentSystemManufacturersInformation) {
                 DataPage78MultiComponentSystemManufacturersInformation infoPage = (DataPage78MultiComponentSystemManufacturersInformation) dataPage;
-                System.out.println("Manufacturer ID: " + infoPage.getManufacturerId());
-                System.out.println("Model Number: " + infoPage.getModelNumber());
+                System.out.println("Manufacturer ID: " + ByteUtils.hexString(infoPage.getManufacturerId()));
+                System.out.println("Model Number: " + ByteUtils.hexString(infoPage.getModelNumber()));
             }
             if (dataPage instanceof AbstractSpeedCadenceDataPage) {
                 calcCadence((AbstractSpeedCadenceDataPage) dataPage);
