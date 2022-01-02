@@ -10,6 +10,34 @@ on:
     types: [ assigned, opened, synchronize, reopened  ] # Defaults
 
 jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # No need to test on multiple operating systems
+        os: [ubuntu-latest]
+        bazelisk: [1.11.0]
+        bazel: [4.2.2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v1
+
+      - name: Mount bazel cache  # Optional
+        uses: actions/cache@v2
+        with:
+          path: "~/.cache/bazel"
+          key: bazel
+
+      - name: Run tests
+        run: bazel test --test_output=all --java_toolchain=@bazel_tools//tools/jdk:toolchain_java11 --host_java_toolchain=@bazel_tools//tools/jdk:toolchain_java11 //:tests
+        shell: bash
+        env:
+          USE_BAZEL_VERSION: ${{ matrix.bazel }}
+
   build-and-upload:
     runs-on: ${{ matrix.os }}
     strategy:

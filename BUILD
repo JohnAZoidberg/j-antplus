@@ -24,6 +24,20 @@ java_library(
     ],
 )
 
+java_test(
+    name = "tests",
+    srcs = glob(
+        ["src/test/java/**/*.java"],
+        # Exclude tests that are supposed to be run interactively with hardware
+        exclude = ["src/test/java/**/anttest/**"]
+    ),
+    test_class = "AllTests",
+    deps = [
+        "//:testing_deps",
+        "//:j_antplus",
+    ],
+)
+
 java_library(
     visibility = ["//visibility:public"],
     name = "j_antplus",

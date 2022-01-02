@@ -77,3 +77,11 @@ Build:
 bazel build bazel build //:j_antplus
 ls -l bazel-bin/libj_antplus.jar
 ```
+
+### Running tests
+
+Automated unit tests with JUnit:
+
+```sh
+bazel test //:tests
+```
