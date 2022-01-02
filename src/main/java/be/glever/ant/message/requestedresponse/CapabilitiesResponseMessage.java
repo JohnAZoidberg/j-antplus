@@ -2,12 +2,21 @@ package be.glever.ant.message.requestedresponse;
 
 import be.glever.ant.AntException;
 import be.glever.ant.message.AbstractAntMessage;
+import be.glever.util.logging.Log;
 
 import java.util.Arrays;
 
 import static be.glever.ant.util.ByteUtils.hasBitSet;
+import be.glever.ant.util.ByteUtils;
 
+/**
+ * Response message describing the device's (transceiver) capabilities
+ *
+ * Document: ANT Message Protocol and Usage Rev 5.1
+ * Section:  9.5.7.4 Capabilities (0x54)
+ */
 public class CapabilitiesResponseMessage extends AbstractAntMessage {
+    private static final Log LOG = Log.getLogger(CapabilitiesResponseMessage.class);
 
     public static final byte MSG_ID = 0x54;
     private byte[] messageBytes;
@@ -27,17 +36,30 @@ public class CapabilitiesResponseMessage extends AbstractAntMessage {
 
     @Override
     public void setMessageBytes(byte[] messageContentBytes) throws AntException {
-        if (messageContentBytes.length != 8) {
+        // The spec doesn't really say how many bytes are required. Probably at
+        // least the number of channels, number of networks and the standard
+        // options. But probably not any of the advances options. Nor the
+        // number of SensRcore channels.
+        // Let's be conservative and require the first 6 bytes.
+        // I've encountered transceivers that provide 6 and some that provide 8 bytes.
+        if (messageContentBytes.length < 6 || messageContentBytes.length > 8) {
+            LOG.error(() -> String.format("Mesage content is %s", ByteUtils.hexString(messageContentBytes)));
             throw new AntException(
-                    String.format("Incorrect message length. Given: %s, expected: 8", messageContentBytes.length));
+                    String.format("Incorrect message content length. Given: %s, expected: 6-8", messageContentBytes.length));
         }
         this.messageBytes = messageContentBytes;
     }
 
+    /**
+     * Number of ANT channels supported by the transceiver
+     */
     public byte getMaxChannels() {
         return messageBytes[0];
     }
 
+    /**
+     * Number of ANT networks supported by the transceiver
+     */
     public short getMaxNetworks() {
         return messageBytes[1];
     }
@@ -46,31 +68,53 @@ public class CapabilitiesResponseMessage extends AbstractAntMessage {
         return messageBytes[2];
     }
 
+    /**
+     * Can receive channels
+     */
     public boolean getReceiveChannels() {
         return !hasBitSet(getStandardOptionsByte(), 0);
     }
 
+    /**
+     * Can transmit channels
+     */
     public boolean getTransmitChannels() {
         return !hasBitSet(getStandardOptionsByte(), 1);
     }
 
+    /**
+     * Can receive messages
+     */
     public boolean getReceiveMessages() {
         return !hasBitSet(getStandardOptionsByte(), 2);
     }
 
+    /**
+     * Can transmit messages
+     */
     public boolean getTransmitMessages() {
         return !hasBitSet(getStandardOptionsByte(), 3);
     }
 
+    /**
+     * Supports acknowledged messages
+     */
     public boolean getAckdMessages() {
         return !hasBitSet(getStandardOptionsByte(), 4);
     }
 
+    /**
+     * Supports burst messages
+     */
     public boolean getBurstMessages() {
         return !hasBitSet(getStandardOptionsByte(), 5);
     }
 
     private byte getAdvancedOptionsByte() {
+        // Optional byte. Default to all zero if not present.
+        if (messageBytes.length < 4) {
+            return 0x00;
+        }
         return messageBytes[3];
     }
 
@@ -99,6 +143,10 @@ public class CapabilitiesResponseMessage extends AbstractAntMessage {
     }
 
     private byte getAdvancedOptions2Byte() {
+        // Optional byte. Default to all zero if not present.
+        if (messageBytes.length < 5) {
+            return 0x00;
+        }
         return messageBytes[4];
     }
 
@@ -131,10 +179,18 @@ public class CapabilitiesResponseMessage extends AbstractAntMessage {
     }
 
     public short getMaxSensRcoreChannels() {
+        // Optional byte. Default to 0 channels if not present.
+        if (messageBytes.length < 6) {
+            return 0;
+        }
         return messageBytes[5];
     }
 
     private byte getAdvancedOptions3Byte() {
+        // Optional byte. Default to all zero if not present.
+        if (messageBytes.length < 7) {
+            return 0x00;
+        }
         return messageBytes[6];
     }
 
@@ -167,6 +223,10 @@ public class CapabilitiesResponseMessage extends AbstractAntMessage {
     }
 
     private byte getAdvancedOptions4Byte() {
+        // Optional byte. Default to all zero if not present.
+        if (messageBytes.length < 8) {
+            return 0x00;
+        }
         return messageBytes[7];
     }
 
