@@ -4,6 +4,7 @@ import be.glever.ant.AntException;
 import be.glever.ant.message.AbstractAntMessage;
 import be.glever.ant.message.AntBlockingMessage;
 import be.glever.ant.message.channel.ChannelEventOrResponseMessage;
+import be.glever.ant.message.configuration.ExtendedAssignment;
 import be.glever.ant.util.ByteArrayBuilder;
 
 public class AssignChannelMessage extends AbstractAntMessage implements AntBlockingMessage {
@@ -14,15 +15,15 @@ public class AssignChannelMessage extends AbstractAntMessage implements AntBlock
     private byte networkNumber;
     private Byte extendedAssignment; // optional
 
-    public AssignChannelMessage(byte channelNumber, byte channelType, byte networkNumber, Byte extendedAssignment) {
+    public AssignChannelMessage(byte channelNumber, byte channelType, byte networkNumber, ExtendedAssignment extendedAssignment) {
         this.channelNumber = channelNumber;
         this.channelType = channelType;
         this.networkNumber = networkNumber;
-        this.extendedAssignment = extendedAssignment;
+        this.extendedAssignment = extendedAssignment.value();
     }
 
     public AssignChannelMessage(byte channelNumber, byte channelType, byte networkNumber) {
-        this(channelNumber, channelType, networkNumber, null);
+        this(channelNumber, channelType, networkNumber, ExtendedAssignment.NO_EXTENDED_ASSIGNMENT);
     }
 
     public AssignChannelMessage() {
