@@ -9,9 +9,9 @@ import be.glever.ant.util.ByteArrayBuilder;
 public class SearchTimeoutMessage extends AbstractAntMessage implements AntBlockingMessage {
 
     private byte channelNumber;
-    private byte searchTimeout;
+    private int searchTimeout;
 
-    public SearchTimeoutMessage(byte channelNumber, byte searchTimeout) {
+    public SearchTimeoutMessage(byte channelNumber, int searchTimeout) {
         this.channelNumber = channelNumber;
         this.searchTimeout = searchTimeout;
     }
@@ -27,8 +27,8 @@ public class SearchTimeoutMessage extends AbstractAntMessage implements AntBlock
     @Override
     public byte[] getMessageContent() {
         return new ByteArrayBuilder()
-                .write(channelNumber)
-                .write(searchTimeout)
+                .write((byte) channelNumber)
+                .write((byte) searchTimeout)
                 .toByteArray();
     }
 
