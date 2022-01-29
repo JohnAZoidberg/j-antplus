@@ -59,8 +59,9 @@ public class HrmTest_Main {
             this.heartbeatCount = dataPage.getHeartBeatCount();
 
             StatSummary statSummary = this.statCalculator.push(dataPage);
-
-            LOG.info(statSummary::toString);
+            if (statSummary != null) {
+                LOG.info(statSummary::toString);
+            }
         }
     }
 

@@ -29,6 +29,11 @@ public class StatCalculator {
     }
 
     private StatSummary createStatSummary() {
+        // Can't do stats if we don't have data yet
+        if (heartBeats.size() == 0) {
+            return null;
+        }
+
         StatSummary statSummary = new StatSummary();
         statSummary.setLastHeartBeat(heartBeats.get(heartBeats.size() - 1));
 
