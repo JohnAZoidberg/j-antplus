@@ -1,7 +1,6 @@
 package be.glever.antplus.power.datapage.main;
 
 import be.glever.ant.util.ByteUtils;
-import be.glever.antplus.power.PedalPower;
 import be.glever.antplus.power.datapage.AbstractPowerDataPage;
 
 /**
@@ -26,7 +25,7 @@ public class PowerDataPage11WheelTorque extends AbstractPowerDataPage {
      * Rollover: 256
      */
     public int getWheelRevolutions() {
-        return getPageSpecificBytes()[1];
+        return getPageSpecificBytes()[1] & 0xFF;
     }
 
     /**
@@ -35,7 +34,7 @@ public class PowerDataPage11WheelTorque extends AbstractPowerDataPage {
      * Range: 0 - 254 RPM
      */
     public int getInstantaneousCadence() {
-        return getPageSpecificBytes()[2];
+        return getPageSpecificBytes()[2] & 0xFF;
     }
 
     /**
@@ -44,7 +43,7 @@ public class PowerDataPage11WheelTorque extends AbstractPowerDataPage {
      */
     public double getWheelPeriod() {
         byte[] pageBytes = getPageSpecificBytes();
-        return ByteUtils.fromUShort(pageBytes[3], pageBytes[4]);
+        return (double)ByteUtils.fromUShort(pageBytes[3], pageBytes[4]) / 2048.0;
     }
 
     /**
@@ -53,7 +52,7 @@ public class PowerDataPage11WheelTorque extends AbstractPowerDataPage {
      */
     public double getAccumulatedTorque() {
         byte[] pageBytes = getPageSpecificBytes();
-        return ByteUtils.fromUShort(pageBytes[5], pageBytes[6]);
+        return (double)ByteUtils.fromUShort(pageBytes[5], pageBytes[6]) / 32.0;
     }
 
     @Override
