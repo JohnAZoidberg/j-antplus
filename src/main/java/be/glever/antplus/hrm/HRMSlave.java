@@ -9,7 +9,7 @@ import be.glever.ant.message.configuration.*;
 import be.glever.ant.message.control.OpenChannelMessage;
 import be.glever.ant.usb.AntUsbDevice;
 import be.glever.ant.util.ByteUtils;
-
+import be.glever.antplus.hrm.HRMChannel;
 import java.util.concurrent.ExecutionException;
 
 public class HRMSlave {
