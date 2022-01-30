@@ -86,10 +86,12 @@ Automated unit tests with JUnit:
 bazel test //:tests
 ```
 
-Manual tests with actual hardare, or rather example program.
+### Example Programs
+
+Manual "tests" with actual hardare, or rather example program.
 
 ```sh
-# Depending on your available hardware, choose one of:
+# Depending on your available sensor hardware, choose one of:
 bazel run //:CadenceTest
 bazel run //:FecTest
 bazel run //:HrmTest
@@ -97,4 +99,52 @@ bazel run //:PowerTest
 bazel run //:SpeedAndCadenceTest
 bazel run //:SpeedCadenceTest
 bazel run //:SpeedTest
+```
+
+To see what capabilities your USB ANT dongle has, you can run the capability test:
+
+```sh
+bazel run //:CapabilityTest
+```
+
+My "USB ANT+ Stick" from Magene, reported as  `ID 0fcf:1008 Dynastream
+Innovations, Inc. ANTUSB2 Stick` by `lsusb` supports these capabilities:
+
+```
+Transceiver supports ANT version: AP2USB1.05
+Transceiver has serial number:    REDACTED
+Standard capabilities:
+  Total number of ANT Channels:   8
+  Receive Channels:               true
+  Transmit Channels:              true
+  Receive Messages:               true
+  Transmit Messages:              true
+  Ackd messages:                  true
+  Burst messages:                 true
+Advanced capabilities:
+  Network Enabled:                true
+  Serial Number Enabled:          true
+  Per Channel TX Power Enabled:   true
+  Low-Priority Serarch Enabled:   true
+  Scipt Enabled:                  false
+  Search List Enabled:            true
+Advanced capabilities2:
+  LED Enabled:                    false
+  Ext Message Enabled:            true
+  Scan Mode Enabled:              true
+  Proximity Search Enabled:       true
+  Extended Assign Enabled:        true
+  FS ANTFS Enabled:               false
+  FIT 1 Enabled:                  false
+Total SensRcore channels:         0
+Advanced capabilities3:
+  Advanced Burst Enabled:         false
+  Event Buffering Enabled:        false
+  Event Filtering Enabled:        false
+  High Duty Search Enabled:       false
+  Search Sharing Enabled:         false
+  Selective Data Updates Enabled: false
+  Encrypted Channel Enabled:      false
+Advanced capabilities4:
+  RF Active Notification Enabled: false
 ```
