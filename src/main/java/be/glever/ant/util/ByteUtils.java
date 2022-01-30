@@ -84,7 +84,7 @@ public class ByteUtils {
             val |= bytes[i - 1] & 0xff;
         }
         int finalVal = val;
-        LOG.debug(() -> format("decoded %s to unsigned int %s", ByteUtils.hexString(bytes), finalVal));
+        LOG.trace(() -> format("decoded %s to unsigned int %s", ByteUtils.hexString(bytes), finalVal));
         return val;
     }
 }

@@ -25,14 +25,14 @@ public class StatSummary {
 
     @Override
     public String toString() {
-        return "StatSummary{" +
-//                "currentBeat=" + currentBeat +
-                ", delta=" + (currentBeat.getHeartBeatEventTime() - currentBeat.getPreviousHeartBeatEventTime()) +
-                ", meanHr=" + meanHeartRate +
-                ", meanRr=" + meanRr +
-                ", stdDevRr=" + stdDevRr +
-                ", rmssd=" + rmssd +
-                '}';
+        return String.format("StatsSummary{currentBeat=%d, delta=%.0fms, meanHr=%.1f, meanRr=%.1f, stdDevRr=%.1f, rmssd=%.1f}",
+                currentBeat.getComputedHeartRateInBpm(),
+                (currentBeat.getHeartBeatEventTime() - currentBeat.getPreviousHeartBeatEventTime()),
+                meanHeartRate,
+                meanRr,
+                stdDevRr,
+                rmssd
+        );
     }
 
     public void setRmssd(double rmssd) {
