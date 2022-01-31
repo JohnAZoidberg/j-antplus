@@ -44,7 +44,9 @@ public abstract class AbstractDataPageRegistry {
 
     protected void add(byte pageNumber, DataPageBuilder builder) {
         if (this.registry.containsKey(pageNumber)) {
-            throw new IllegalStateException("Duplicate DataPage defined in registry: " + pageNumber);
+            // Ignore duplicate pages. Needed for ComprehensiveDataPageRegistry
+            LOG.trace(() -> "Duplicate DataPage defined in registry: " + pageNumber);
+            return;
         }
         this.registry.put(pageNumber, builder);
     }
