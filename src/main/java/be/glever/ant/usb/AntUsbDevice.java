@@ -273,7 +273,7 @@ public class AntUsbDevice implements Closeable {
         throw new IllegalStateException("No available channels found");
     }
 
-    private void initUsbInterface() throws AntException, UsbException {
+    public void initUsbInterface() throws AntException, UsbException {
         UsbInterface usbInterface = getActiveUsbInterface();
         if (usbInterface.isClaimed()) {
             throw new AntException("Usb device already claimed");
@@ -348,7 +348,7 @@ public class AntUsbDevice implements Closeable {
         return (UsbInterface) this.device.getActiveUsbConfiguration().getUsbInterfaces().get(0);
     }
 
-    private void closeChannel(byte channelNumber) throws AntException {
+    public void closeChannel(byte channelNumber) throws AntException {
         UnassignChannelMessage unassignChannelMessage = new UnassignChannelMessage(channelNumber);
         ChannelEventOrResponseMessage unassignResponseMsg = (ChannelEventOrResponseMessage) sendBlocking(unassignChannelMessage);
         if (unassignResponseMsg.getResponseCode() != ChannelEventResponseCode.RESPONSE_NO_ERROR) {
