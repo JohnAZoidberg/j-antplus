@@ -66,7 +66,7 @@ public class AntChannelId {
     }
 
     public int getIntDeviceNumber() {
-        return ByteUtils.toInt(deviceNumber[1], deviceNumber[0]);
+        return ByteUtils.fromUnsignedBytes(new byte[]{deviceNumber[1], deviceNumber[0]});
     }
 
     public void setDeviceNumber(byte[] deviceNumber) {
@@ -74,6 +74,11 @@ public class AntChannelId {
     }
 
     public String toString() {
-        return "AntChannelId{transmissionType=" + transmissionType + ", deviceType=" + deviceType + ", deviceNumber=" + Arrays.toString(deviceNumber) + "}";
+        return String.format(
+            "AntChannelId{transmissionType=%s, deviceType=%s, deviceNumber=%s}",
+            transmissionType,
+            deviceType,
+            Arrays.toString(deviceNumber)
+        );
     }
 }

@@ -56,4 +56,9 @@ public class AntChannelTransmissionType {
     public byte getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return String.format("0x%02X", this.value);
+    }
 }

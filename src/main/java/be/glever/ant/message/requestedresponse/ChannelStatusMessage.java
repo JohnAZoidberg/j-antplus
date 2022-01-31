@@ -56,9 +56,6 @@ public class ChannelStatusMessage extends AbstractAntMessage {
 
     @Override
     public String toString() {
-        return "ChannelStatusMessage{" +
-                "channelStatus=" + getChannelStatus() +
-                ", channelStatus=" + getChannelStatus() +
-                '}';
+        return String.format("ChannelStatusMessage{status=%s}", getChannelStatus());
     }
 }
