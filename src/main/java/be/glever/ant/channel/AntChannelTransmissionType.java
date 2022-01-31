@@ -1,5 +1,8 @@
 package be.glever.ant.channel;
 
+import be.glever.ant.channel.SharedAddressIndicator;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 public class AntChannelTransmissionType {
     private byte value;
 
@@ -7,6 +10,22 @@ public class AntChannelTransmissionType {
      * Use this one for searching devices. It is the Master device that decides the TransmissionType, which slaves must use when opening a channel.
      */
     public static final AntChannelTransmissionType PAIRING_TRANSMISSION_TYPE = new AntChannelTransmissionType((byte) 0, (byte) 0, (byte) 0);
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AntChannelTransmissionType)) {
+            return false;
+        }
+        AntChannelTransmissionType other = (AntChannelTransmissionType)obj;
+        return this.value == other.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).
+          append(value).
+          toHashCode();
+    }
 
     public AntChannelTransmissionType(byte value) {
         this.value = value;
@@ -22,8 +41,8 @@ public class AntChannelTransmissionType {
         this.value = (byte) (sharedAddressIndicator | globalDataPagesUsage | deviceNumberExtension);
     }
 
-    public byte getSharedAddressIndicator() {
-        return (byte) (value & 0b11);
+    public SharedAddressIndicator getSharedAddressIndicator() {
+        return SharedAddressIndicator.valueOf((byte)(this.value & 0b11)).get();
     }
 
     public byte getGlobalDataPagesUsage() {
@@ -32,18 +51,6 @@ public class AntChannelTransmissionType {
 
     public byte getOptionalDeviceNumberExtension() {
         return (byte) (value >> 4);
-    }
-
-    public interface SharedAddressIndicator {
-        byte RESERVED = 0;
-        byte INDEPENDENT = 1;
-        byte SHARED_WITH_1_BYTE_ADDRESS = 0b10;
-        byte SHARED_WITH_2_BYTE_ADDRESS = 0b11;
-    }
-
-    public interface GlobalDataPagesUsage {
-        byte NOT_USED = 0;
-        byte USED = 1;
     }
 
     public byte getValue() {
