@@ -27,6 +27,7 @@ Goal is to implement needed ant messages and ANT+ datapages in order to talk to 
 
 
 # Current status: 
+
 Codebase still unstable but foundation is shaping up. Expect a few heavy refactors until things stabilize.
 Check out the Hrm/SpeedTest/Cadence/Fec examples to get started. Many thanks to https://github.com/JohnAZoidberg for help with implementing most of the devices.
 
@@ -55,9 +56,6 @@ udevadm control --reload-rules
 After this, unplug and re-plug the dongle.
 
 ## Building
-
-Currently Maven and Bazel build files are there but active work is done only on
-the Bazel build system. Therefore that is preferred.
 
 Install:
 
