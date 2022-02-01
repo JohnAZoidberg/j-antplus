@@ -78,6 +78,17 @@ bazel build bazel build //:j_antplus
 ls -l bazel-bin/libj_antplus.jar
 ```
 
+#### Building JavaDoc
+
+```sh
+bazel build //:j_antplus_javadoc
+
+# The result is here:
+ls -l bazel-bin/j_antplus_javadoc.jar
+```
+
+You can extract the JavaDoc JAR and open the index.html.
+
 ### Running tests
 
 Automated unit tests with JUnit:
