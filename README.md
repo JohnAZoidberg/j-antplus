@@ -81,10 +81,10 @@ ls -l bazel-bin/libj_antplus.jar
 #### Building JavaDoc
 
 ```sh
-bazel build //:j_antplus_javadoc
+bazel build //:j_antplus_-docs
 
 # The result is here:
-ls -l bazel-bin/j_antplus_javadoc.jar
+ls -l bazel-bin/j_antplus_docs.jar
 ```
 
 You can extract the JavaDoc JAR and open the index.html.
