@@ -27,6 +27,7 @@ Goal is to implement needed ant messages and ANT+ datapages in order to talk to 
 
 
 # Current status: 
+
 Codebase still unstable but foundation is shaping up. Expect a few heavy refactors until things stabilize.
 Check out the Hrm/SpeedTest/Cadence/Fec examples to get started. Many thanks to https://github.com/JohnAZoidberg for help with implementing most of the devices.
 
@@ -53,3 +54,45 @@ echo 'ATTRS{idVendor}=="fcf", ATTRS{idProduct}=="1009", MODE="0666"' > /etc/udev
 udevadm control --reload-rules
 ```
 After this, unplug and re-plug the dongle.
+
+## Building
+
+Install:
+
+- Bazel 4.2
+- OpenJDK11
+
+If you have Nix installed, you can get a shell with the dependencies like this:
+
+```
+nix-shell -p gnumake openjdk bazel_4
+```
+
+Build:
+
+```sh
+# Commandline
+bazel build bazel build //:j_antplus
+ls -l bazel-bin/libj_antplus.jar
+```
+
+### Running tests
+
+Automated unit tests with JUnit:
+
+```sh
+bazel test //:tests
+```
+
+Manual tests with actual hardare, or rather example program.
+
+```sh
+# Depending on your available hardware, choose one of:
+bazel run //:CadenceTest
+bazel run //:FecTest
+bazel run //:HrmTest
+bazel run //:PowerTest
+bazel run //:SpeedAndCadenceTest
+bazel run //:SpeedCadenceTest
+bazel run //:SpeedTest
+```
