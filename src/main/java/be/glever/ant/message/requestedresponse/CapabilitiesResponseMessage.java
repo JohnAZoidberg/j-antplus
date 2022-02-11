@@ -198,7 +198,7 @@ public class CapabilitiesResponseMessage extends AbstractAntMessage {
         return hasBitSet(getAdvancedOptions3Byte(), 0);
     }
 
-    public boolean getEventBuffereingEnabled() {
+    public boolean getEventBufferingEnabled() {
         return hasBitSet(getAdvancedOptions3Byte(), 1);
     }
 
@@ -250,7 +250,7 @@ public class CapabilitiesResponseMessage extends AbstractAntMessage {
                 + getProxSearchEnabled() + ", getExtAssignEnabled()=" + getExtAssignEnabled() + ", getFsAntFsEnabled()="
                 + getFsAntFsEnabled() + ", getFit1Enabled()=" + getFit1Enabled() + ", getMaxSensRcoreChannels()="
                 + getMaxSensRcoreChannels() + ", getAdvancedBurstEnabled()=" + getAdvancedBurstEnabled()
-                + ", getEventBuffereingEnabled()=" + getEventBuffereingEnabled() + ", getEventFilteringEnabled()="
+                + ", getEventBufferingEnabled()=" + getEventBufferingEnabled() + ", getEventFilteringEnabled()="
                 + getEventFilteringEnabled() + ", getHighDutySearchEnabled()=" + getHighDutySearchEnabled()
                 + ", getSearchSharingEnabled()=" + getSearchSharingEnabled() + ", getSelectiveDataUpdatesEnabled()="
                 + getSelectiveDataUpdatesEnabled() + ", getEncryptedChannelEnabled()=" + getEncryptedChannelEnabled()

@@ -115,8 +115,8 @@ public class AntUsbDeviceCapabilities {
         return crMsg.getAdvancedBurstEnabled();
     }
 
-    public boolean getEventBuffereingEnabled() {
-        return crMsg.getEventBuffereingEnabled();
+    public boolean getEventBufferingEnabled() {
+        return crMsg.getEventBufferingEnabled();
     }
 
     public boolean getEventFilteringEnabled() {
