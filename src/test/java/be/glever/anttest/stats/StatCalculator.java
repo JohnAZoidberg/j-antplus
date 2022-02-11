@@ -49,8 +49,6 @@ public class StatCalculator {
         statSummary.setStdDevRr(standardDeviationDelta);
         statSummary.setRmssd(rmssd);
         statSummary.setMeanHeartRate(meanHeartRate);
-
-        LOG.debug(statSummary::toString);
         return statSummary;
     }
 

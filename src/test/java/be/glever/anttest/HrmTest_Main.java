@@ -1,12 +1,18 @@
 package be.glever.anttest;
 
 import be.glever.ant.message.AntMessage;
+import be.glever.ant.message.channel.ChannelEventOrResponseMessage;
+import be.glever.ant.message.channel.ChannelEventResponseCode;
 import be.glever.ant.message.data.BroadcastDataMessage;
 import be.glever.ant.usb.AntUsbDevice;
 import be.glever.ant.usb.AntUsbDeviceFactory;
 import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
 import be.glever.antplus.hrm.HRMChannel;
 import be.glever.antplus.hrm.datapage.HrmDataPageRegistry;
+import be.glever.antplus.hrm.datapage.background.HrmDataPage1CumulativeOperatingTime;
+import be.glever.antplus.hrm.datapage.background.HrmDataPage2ManufacturerInformation;
+import be.glever.antplus.hrm.datapage.background.HrmDataPage3ProductInformation;
+import be.glever.antplus.hrm.datapage.background.HrmDataPage7BatteryStatus;
 import be.glever.antplus.hrm.datapage.main.HrmDataPage4PreviousHeartBeatEvent;
 import be.glever.anttest.stats.StatCalculator;
 import be.glever.anttest.stats.StatSummary;
@@ -43,12 +49,52 @@ public class HrmTest_Main {
             removeToggleBit(payLoad);
             AbstractAntPlusDataPage dataPage = registry.constructDataPage(payLoad);
 
-            LOG.debug(() -> "Received datapage " + dataPage.toString());
             if (dataPage instanceof HrmDataPage4PreviousHeartBeatEvent) {
                 calcStats((HrmDataPage4PreviousHeartBeatEvent) dataPage);
+            } else if (dataPage instanceof HrmDataPage2ManufacturerInformation) {
+                HrmDataPage2ManufacturerInformation dp = (HrmDataPage2ManufacturerInformation) dataPage;
+                LOG.debug(() -> String.format(
+                        "Manufacturer: %d, SerialNumber: %d",
+                        dp.getManufacturerId(),
+                        dp.getSerialNumber()
+                ));
+            } else if (dataPage instanceof HrmDataPage3ProductInformation) {
+                HrmDataPage3ProductInformation dp = (HrmDataPage3ProductInformation) dataPage;
+                LOG.debug(() -> String.format(
+                        "HardwareVersion: %d, SoftwareVersion: %d, ModelNumber: %d",
+                        dp.getHardwareVersion(),
+                        dp.getSoftwareVersion(),
+                        dp.getModelNumber()
+                ));
+            } else if (dataPage instanceof HrmDataPage7BatteryStatus) {
+                HrmDataPage7BatteryStatus dp = (HrmDataPage7BatteryStatus) dataPage;
+                LOG.debug(() -> String.format(
+                        "Battery - Level: %d%%, Voltage: %.2f, Status: %s",
+                        dp.getBatteryLevelPercentage(),
+                        dp.getBatteryVoltage(),
+                        dp.getBatteryVoltageDescription().name()
+                ));
+            } else if (dataPage instanceof HrmDataPage1CumulativeOperatingTime) {
+                HrmDataPage1CumulativeOperatingTime dp = (HrmDataPage1CumulativeOperatingTime) dataPage;
+                LOG.debug(() -> String.format(
+                        "Cumulative Operating time: %ds / %.1fh",
+                        dp.getCumulativeOperatingTime(),
+                        dp.getCumulativeOperatingTime() / 3600.0
+                ));
+            } else {
+                LOG.debug(() -> "Received " + dataPage.toString());
             }
         } else {
-//            LOG.warn(()->format("Ignoring message  %s", antMessage));
+            if (antMessage instanceof ChannelEventOrResponseMessage) {
+                ChannelEventOrResponseMessage channelEventOrResponseMessage = (ChannelEventOrResponseMessage) antMessage;
+                if (channelEventOrResponseMessage.getResponseCode() == ChannelEventResponseCode.EVENT_RX_FAIL) {
+                    // Not a useful message. Occurs when the channel is
+                    // expecting a message at a fixed rate but didn't receive
+                    // one.
+                    return;
+                }
+            }
+            LOG.warn(()-> String.format("Ignoring message  %s", antMessage));
         }
     }
 

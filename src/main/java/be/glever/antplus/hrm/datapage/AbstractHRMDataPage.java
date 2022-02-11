@@ -50,10 +50,11 @@ public abstract class AbstractHRMDataPage extends AbstractAntPlusDataPage {
     }
 
     protected String getToString() {
-        return "heartBeatEventTime=" + getHeartBeatEventTime()
-                + ",heartBeatCount=" + getHeartBeatCount()
-                + ",computedHeartRateInBpm=" + getComputedHeartRateInBpm();
+        return String.format(
+            "eventTime=%d,heartBeatCount=%d,computedHeartRate=%d",
+            getHeartBeatEventTime(),
+            getHeartBeatCount(),
+            getComputedHeartRateInBpm()
+        );
     }
-
-
 }
