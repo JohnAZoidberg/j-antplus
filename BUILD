@@ -1,4 +1,5 @@
 load("@rules_java//java:defs.bzl", "java_library")
+load("@rules_jvm_external//:defs.bzl", "javadoc")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -94,4 +95,11 @@ java_library(
     srcs = glob(["src/main/java/**/*.java"]),
     resources = glob(["src/main/resources/**"]),
     deps = ["//:java_deps"],
+)
+
+javadoc(
+    name = "j_antplus_javadoc",
+    deps = [
+      ":j_antplus"
+    ],
 )
