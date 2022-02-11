@@ -271,16 +271,19 @@ public class AntUsbDevice implements Closeable {
         CapabilitiesResponseMessage capabilitiesResponseMessage = (CapabilitiesResponseMessage) sendBlocking(RequestMessage.forMessageId(CapabilitiesResponseMessage.MSG_ID));
         this.capabilities = new AntUsbDeviceCapabilities(capabilitiesResponseMessage);
         this.antChannels = new AntChannel[capabilities.getMaxChannels()];
+        LOG.debug(() -> format("Transceiver Capabilities: %s", this.capabilities.toString()));
 
         AntVersionMessage antVersionMessage = (AntVersionMessage) sendBlocking(RequestMessage.forMessageId(AntVersionMessage.MSG_ID));
         this.antVersion = antVersionMessage.getAntVersion();
+        LOG.debug(() -> format("Transceiver Ant Version: %s", ByteUtils.hexString(this.antVersion)));
 
-        SerialNumberMessage serialNumberMessage = (SerialNumberMessage) sendBlocking(RequestMessage.forMessageId(SerialNumberMessage.MSG_ID));
-        this.serialNumber = serialNumberMessage.getSerialNumber();
-
-        LOG.debug(() -> format("Capabilities: %s", this.capabilities.toString()));
-        LOG.debug(() -> format("Ant Version: %s", ByteUtils.hexString(this.antVersion)));
-        LOG.debug(() -> format("SerialNumber: %s", ByteUtils.hexString(this.serialNumber)));
+        if (this.capabilities.getSerialNumberEnabled()) {
+            SerialNumberMessage serialNumberMessage = (SerialNumberMessage) sendBlocking(RequestMessage.forMessageId(SerialNumberMessage.MSG_ID));
+            this.serialNumber = serialNumberMessage.getSerialNumber();
+            LOG.debug(() -> format("Transceiver SerialNumber: %s", ByteUtils.hexString(this.serialNumber)));
+        } else {
+            LOG.debug(() -> format("Transceiver SerialNumber: NOT SUPPORTED!"));
+        }
     }
 
     private void resetUsbDevice() throws InterruptedException {
