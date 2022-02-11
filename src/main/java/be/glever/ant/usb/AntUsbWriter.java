@@ -20,7 +20,7 @@ public class AntUsbWriter {
     public synchronized void write(AntMessage message) throws AntException {
         try {
             byte[] messageBytes = message.toByteArray();
-            LOG.debug(() -> format("Sending %s with bytes %s.", message.getClass().getSimpleName(), ByteUtils.hexString(messageBytes)));
+            LOG.trace(() -> format("Sending %s with bytes %s.", message.getClass().getSimpleName(), ByteUtils.hexString(messageBytes)));
             outPipe.syncSubmit(messageBytes);
         } catch (Throwable t) {
             throw new AntException(t);

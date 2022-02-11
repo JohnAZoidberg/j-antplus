@@ -26,12 +26,7 @@ public class HRMChannel extends AntChannel {
 	public static final byte DEFAULT_PUBLIC_NETWORK = 0x00;
 	private static final Log LOG = Log.getLogger(HRMChannel.class);
 	private final AntUsbDevice device;
-	byte[] CHANNEL_PERIOD = ByteUtils.toUShort(8070);
-
-	// todo doesnt belong here
-	private int heartBeatEventTime;
-
-
+	public static final byte[] CHANNEL_PERIOD = ByteUtils.toUShort(8070);
 	private Flux<AntMessage> eventFlux;
 
 	/**

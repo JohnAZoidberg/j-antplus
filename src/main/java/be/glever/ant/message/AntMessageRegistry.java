@@ -78,7 +78,7 @@ public class AntMessageRegistry {
         Class<? extends AbstractAntMessage> messageClass = registry.get(msgId);
         final AntMessage messageInstance = getMessageInstance(msgBytes, msgId, msgBytes, messageClass);
 
-        LOG.debug(() -> format("Converted %s to %s", ByteUtils.hexString(msgBytes), messageInstance.getClass().getSimpleName()));
+        LOG.trace(() -> format("Converted %s to %s", ByteUtils.hexString(msgBytes), messageInstance.getClass().getSimpleName()));
         return messageInstance;
     }
 

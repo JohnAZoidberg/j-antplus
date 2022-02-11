@@ -21,6 +21,12 @@ public class Log {
         return new Log(LoggerFactory.getLogger(clazz));
     }
 
+    public void trace(Supplier<String> msgSupplier) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(msgSupplier.get());
+        }
+    }
+
     public void debug(Supplier<String> msgSupplier) {
         if (this.logger.isDebugEnabled()) {
             this.logger.debug(msgSupplier.get());
