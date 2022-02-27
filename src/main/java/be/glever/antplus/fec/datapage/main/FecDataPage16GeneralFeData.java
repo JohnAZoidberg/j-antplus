@@ -70,7 +70,7 @@ public class FecDataPage16GeneralFeData extends AbstractPowerDataPage {
      * Range: 0-254 bpm
      */
     public int getHeartRate() {
-        return getPageSpecificBytes()[5];
+        return ByteUtils.toInt(this.getPageSpecificBytes()[5]);
     }
 
     public Optional<HeartRateDataSource> getHeartRateSource() {

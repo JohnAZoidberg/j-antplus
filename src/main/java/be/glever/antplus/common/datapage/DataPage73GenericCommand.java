@@ -1,5 +1,6 @@
 package be.glever.antplus.common.datapage;
 
+import be.glever.ant.util.ByteUtils;
 import java.util.Arrays;
 
 public class DataPage73GenericCommand extends AbstractAntPlusDataPage {
@@ -24,8 +25,8 @@ public class DataPage73GenericCommand extends AbstractAntPlusDataPage {
 
     }
 
-    public byte getSequenceNr() {
-        return getDataPageBytes()[5];
+    public int getSequenceNr() {
+        return ByteUtils.toInt(getDataPageBytes()[5]);
     }
 
     public byte[] getCommandNumber() {
