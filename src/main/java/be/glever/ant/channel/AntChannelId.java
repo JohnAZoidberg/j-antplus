@@ -1,6 +1,9 @@
 package be.glever.ant.channel;
 
 import be.glever.ant.constants.AntPlusDeviceType;
+import be.glever.ant.util.ByteUtils;
+import java.util.Arrays;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class AntChannelId {
 
@@ -8,12 +11,33 @@ public class AntChannelId {
     private byte deviceType; // set by master device, 0 for slave devices. TODO MSB is a pairing bit. split device type from pairing bit?
     private byte[] deviceNumber; // TODO remember this is little endian
 
-    public AntChannelId() {
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AntChannelId)) {
+            return false;
+        }
+        AntChannelId other = (AntChannelId)obj;
+        return transmissionType.equals(other.transmissionType) && deviceType == other.deviceType && Arrays.equals(deviceNumber, other.deviceNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).
+          append(transmissionType).
+          append(deviceType).
+          append(deviceNumber).
+          toHashCode();
     }
 
     public AntChannelId(AntChannelTransmissionType transmissionType, AntPlusDeviceType deviceType, byte[] deviceNumber) {
         this.transmissionType = transmissionType;
         this.deviceType = deviceType.value();
+        this.deviceNumber = deviceNumber;
+    }
+
+    public AntChannelId(AntChannelTransmissionType transmissionType, byte deviceTypeId, byte[] deviceNumber) {
+        this.transmissionType = transmissionType;
+        this.deviceType = AntPlusDeviceType.valueOf(deviceTypeId).get().value();
         this.deviceNumber = deviceNumber;
     }
 
@@ -25,7 +49,11 @@ public class AntChannelId {
         this.transmissionType = transmissionType;
     }
 
-    public byte getDeviceType() {
+    public AntPlusDeviceType getDeviceType() {
+        return AntPlusDeviceType.valueOf(deviceType).get();
+    }
+
+    public byte getDeviceTypeId() {
         return deviceType;
     }
 
@@ -37,9 +65,20 @@ public class AntChannelId {
         return deviceNumber;
     }
 
+    public int getIntDeviceNumber() {
+        return ByteUtils.fromUnsignedBytes(new byte[]{deviceNumber[1], deviceNumber[0]});
+    }
+
     public void setDeviceNumber(byte[] deviceNumber) {
         this.deviceNumber = deviceNumber;
     }
 
-
+    public String toString() {
+        return String.format(
+            "AntChannelId{transmissionType=%s, deviceType=%s, deviceNumber=%s}",
+            transmissionType,
+            deviceType,
+            Arrays.toString(deviceNumber)
+        );
+    }
 }

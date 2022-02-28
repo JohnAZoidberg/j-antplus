@@ -1,6 +1,10 @@
 package be.glever.ant.constants;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 public enum AntPlusDeviceType {
+    Any((byte) 0x00),
     Fec((byte) 0x11),
     Power((byte) 0x0B),
     HRM((byte) 0x78),
@@ -10,8 +14,12 @@ public enum AntPlusDeviceType {
 
     private byte value;
 
-    AntPlusDeviceType(byte i) {
-        value = i;
+    AntPlusDeviceType(byte value) {
+        this.value = value;
+    }
+
+    public static Optional<AntPlusDeviceType> valueOf(int value) {
+        return Arrays.stream(AntPlusDeviceType.values()).filter(legNo -> legNo.value == value).findFirst();
     }
 
     public byte value() {

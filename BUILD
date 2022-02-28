@@ -74,6 +74,18 @@ java_binary(
     srcs = glob(["src/test/java/be/glever/anttest/SpeedTest_Main.java"]),
     deps = [":j_antplus", ":test_stat_lib"],
 )
+java_binary(
+    name = "ScanningTest",
+    main_class = "be.glever.anttest.ScanningTest_Main",
+    srcs = glob(["src/test/java/be/glever/anttest/ScanningTest_Main.java"]),
+    deps = [":j_antplus", ":test_stat_lib"],
+)
+java_binary(
+    name = "CapabilityTest",
+    main_class = "be.glever.anttest.CapabilityTest_Main",
+    srcs = glob(["src/test/java/be/glever/anttest/CapabilityTest_Main.java"]),
+    deps = [":j_antplus", ":test_stat_lib"],
+)
 
 # Automated tests
 java_test(

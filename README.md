@@ -110,6 +110,8 @@ bazel run //:SpeedCadenceTest
 bazel run //:SpeedTest
 ```
 
+#### Capability Test
+
 To see what capabilities your USB ANT dongle has, you can run the capability test:
 
 ```sh
@@ -157,3 +159,25 @@ Advanced capabilities3:
 Advanced capabilities4:
   RF Active Notification Enabled: false
 ```
+
+#### Scanning Test
+
+To do a background scan for ANT broadcasting ANT devices, run the scanning test:
+
+```sh
+bazel run //:ScanningTest
+```
+
+Example output while wearing a GIANT HRM:
+
+```
+15:25:15 [elastic-2] INFO  b.g.a.ScanningTest_Main - Reached search timeout. Stopping search
+15:25:15 [elastic-2] INFO  b.g.a.ScanningTest_Main - Found 1 devices:
+15:25:15 [elastic-2] INFO  b.g.a.ScanningTest_Main - HRM (ID: 33916) - Model Number: 1)
+```
+
+You need to be aware that manufacturer information and model number is
+transmitted via background pages. These are transmitted only every couple dozen
+pages. So it can take a minute or two to get the full device information.
+The channel ID (and sensor type) is transmitted in the extended section of
+every message, so it's found quickly.

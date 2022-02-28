@@ -1,12 +1,20 @@
 package be.glever.ant.message;
 
 import be.glever.ant.AntException;
+import be.glever.ant.channel.AntChannelId;
+import be.glever.ant.channel.AntChannelTransmissionType;
+import be.glever.ant.constants.AntPlusDeviceType;
+import be.glever.ant.message.AntMessage;
+import be.glever.ant.message.Rssi;
 import be.glever.ant.util.ByteArrayBuilder;
 import be.glever.ant.util.ByteUtils;
+import be.glever.util.logging.Log;
 
 import java.util.Arrays;
 
 public abstract class AbstractAntMessage implements AntMessage {
+    private static final Log LOG = Log.getLogger(AbstractAntMessage.class);
+    private byte[] bytes;
 
     public abstract byte[] getMessageContent();
 
@@ -31,6 +39,7 @@ public abstract class AbstractAntMessage implements AntMessage {
 
     @Override
     public void parse(byte[] bytes) throws AntException {
+        this.bytes = bytes;
         validateNumberDataBytes(bytes);
         validateChecksum(bytes);
         setMessageBytes(Arrays.copyOfRange(bytes, 3, bytes.length - 1));
@@ -65,4 +74,47 @@ public abstract class AbstractAntMessage implements AntMessage {
         }
     }
 
+    public Object getExtendedData() {
+        byte contentByteSize = this.bytes[1];
+        if (contentByteSize < 10) {
+            return null;
+        }
+
+        int flagByte = this.bytes[12] & 0xFF;
+        switch (flagByte) {
+            case 0x80:
+                LOG.trace(() -> "Found channel ID flagged extended data");
+                return this.bytesToChannelId(Arrays.copyOfRange(this.bytes, 13, 17)); // 4 bytes
+            case 0x40:
+                LOG.trace(() -> "Found RSSI flagged extended data");
+                return this.bytesToRssi(Arrays.copyOfRange(this.bytes, 13, 16)); // 3 bytes
+            case 0x20:
+                LOG.trace(() -> "Found Rx timestamp flagged extended data");
+                return ByteUtils.toInt(this.bytes[13], this.bytes[14]);
+            case 0xE0:
+                LOG.trace(() -> "Found channel ID, RSSI, and Rx timestamp flagged extended data");
+                return null;
+            case 0xA0:
+                LOG.trace(() -> "Found channel ID, and Rx timestamp flagged extended data");
+                return null;
+            case 0x60:
+                LOG.trace(() -> "Found RSSI, and Rx timestamp flagged extended data");
+                return null;
+            // TODO: Should also handle legacy extended data, right?
+            default:
+                return null;
+        }
+    }
+
+    private AntChannelId bytesToChannelId(byte[] bytes) throws AntException {
+        AntPlusDeviceType deviceType = AntPlusDeviceType.valueOf(bytes[2]).orElseThrow(() -> new AntException("Standard message does not have extended data"));
+        return new AntChannelId(new AntChannelTransmissionType(bytes[3]), deviceType, Arrays.copyOfRange(bytes, 0, 2));
+    }
+
+    private Rssi bytesToRssi(byte[] bytes) {
+        if (bytes[0] != 32) {
+            return null;
+        }
+        return new Rssi(bytes[1], bytes[2]);
+    }
 }

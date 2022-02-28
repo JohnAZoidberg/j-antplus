@@ -5,6 +5,11 @@ import be.glever.antplus.common.datapage.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Registry of all common datapages
+ * 
+ * Necessary when scanning for devices to get information about the device.
+ */
 public class CommonDataPageRegistry extends AbstractDataPageRegistry {
 
     private Map<Byte, Class<? extends AbstractAntPlusDataPage>> registry = new HashMap<>();

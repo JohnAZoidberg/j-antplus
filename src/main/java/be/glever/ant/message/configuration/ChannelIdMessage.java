@@ -1,6 +1,9 @@
 package be.glever.ant.message.configuration;
 
 import be.glever.ant.AntException;
+import be.glever.ant.channel.AntChannelId;
+import be.glever.ant.channel.AntChannelTransmissionType;
+import be.glever.ant.constants.AntPlusDeviceType;
 import be.glever.ant.message.AbstractAntMessage;
 import be.glever.ant.message.AntBlockingMessage;
 import be.glever.ant.message.channel.ChannelEventOrResponseMessage;
@@ -17,6 +20,10 @@ public class ChannelIdMessage extends AbstractAntMessage implements AntBlockingM
         this.bytes = new byte[]{channelNr, deviceNr[0], deviceNr[1], deviceTypeID, transmissionType};
     }
 
+    public AntChannelId getChannelId() {
+        return new AntChannelId(this.getTransmissionType(), this.getDeviceTypeId(), this.getDeviceNr());
+    }
+
     public byte getChannelNr() {
         return bytes[0];
     }
@@ -29,8 +36,12 @@ public class ChannelIdMessage extends AbstractAntMessage implements AntBlockingM
         return bytes[3];
     }
 
-    public byte getTransmissionType() {
-        return bytes[4];
+    public AntPlusDeviceType getDeviceType() {
+        return AntPlusDeviceType.valueOf(this.getDeviceTypeId()).get();
+    }
+
+    public AntChannelTransmissionType getTransmissionType() {
+        return new AntChannelTransmissionType(this.bytes[4]);
     }
 
     @Override
