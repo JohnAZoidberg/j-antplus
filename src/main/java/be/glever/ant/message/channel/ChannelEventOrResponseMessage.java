@@ -2,7 +2,6 @@ package be.glever.ant.message.channel;
 
 import be.glever.ant.AntException;
 import be.glever.ant.message.AbstractAntMessage;
-import be.glever.ant.message.channel.ChannelEventResponseCode;
 import be.glever.ant.util.ByteUtils;
 
 

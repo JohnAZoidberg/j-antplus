@@ -16,11 +16,14 @@ import be.glever.ant.message.configuration.SearchTimeoutMessage;
 import be.glever.ant.message.configuration.SetLowPrioritySearchTimeoutMessage;
 import be.glever.ant.message.control.OpenRxScanModeMessage;
 import be.glever.ant.message.control.RequestMessage;
+import be.glever.ant.message.data.BroadcastDataMessage;
 import be.glever.ant.message.requestedresponse.ChannelStatusMessage;
 import be.glever.ant.usb.AntUsbDevice;
 import be.glever.ant.usb.AntUsbDeviceCapabilities;
 import be.glever.ant.usb.RequestMatcher;
+import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
 import be.glever.antplus.hrm.HRMChannel;
+import be.glever.antplus.hrm.datapage.HrmDataPageRegistry;
 import be.glever.util.logging.Log;
 
 import java.util.ArrayList;
@@ -35,6 +38,9 @@ public class AntPlusDeviceScanner {
     private AntUsbDevice antUsbDevice;
     private AntChannelType CHANNEL_TYPE = AntChannelType.BIDIRECTIONAL_SLAVE;
     public byte NETWORK_NUMBER = 0;
+    private AntChannelNetwork NETWORK = new AntChannelNetwork(this.NETWORK_NUMBER, AntNetworkKeys.ANT_PLUS_NETWORK_KEY);
+    private Flux<AntMessage> eventFlux;
+    private HrmDataPageRegistry registry = new HrmDataPageRegistry();
 
     public AntPlusDeviceScanner(AntUsbDevice antUsbDevice) {
         this.antUsbDevice = antUsbDevice;
@@ -73,6 +79,15 @@ public class AntPlusDeviceScanner {
         }
         return availableDevices;
     }
+
+    //private void handle(AntMessage antMessage) {
+    //    BroadcastDataMessage msg;
+    //    byte[] payLoad;
+    //    AbstractAntPlusDataPage dataPage;
+    //    if (antMessage instanceof BroadcastDataMessage && (dataPage = this.registry.constructDataPage(payLoad = (msg = (BroadcastDataMessage)antMessage).getPayLoad())) != null) {
+    //        System.out.print(dataPage.toString());
+    //    }
+    //}
 
     public void openRxScanMode() throws AntException, ExecutionException, InterruptedException {
         HRMChannel channel = new HRMChannel(antUsbDevice);

@@ -48,4 +48,21 @@ public class DataPage70Request extends AbstractAntPlusDataPage {
     public byte getPageNumber() {
         return PAGE_NR;
     }
+
+    public static enum CommandType {
+        REQUEST_DATA_PAGE((byte) 1),
+        REQUEST_ANTFS_SESSION((byte) 2),
+        REQUEST_DATA_PAGE_FROM_SLAVE((byte) 3),
+        REQUEST_DATA_PAGE_SET((byte) 4);
+
+        private byte value;
+
+        private CommandType(byte value) {
+            this.value = value;
+        }
+
+        public byte value() {
+            return this.value;
+        }
+    }
 }

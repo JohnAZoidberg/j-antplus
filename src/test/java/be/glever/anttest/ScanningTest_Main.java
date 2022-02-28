@@ -13,19 +13,20 @@ import be.glever.ant.usb.AntUsbDevice;
 import be.glever.ant.usb.AntUsbDeviceFactory;
 import be.glever.ant.util.ByteUtils;
 import be.glever.antplus.common.datapage.AbstractAntPlusDataPage;
-import be.glever.antplus.hrm.HRMChannel;
 import be.glever.antplus.common.datapage.DataPage80ManufacturersInformation;
 import be.glever.antplus.common.datapage.registry.ComprehensiveDataPageRegistry;
 import be.glever.antplus.hrm.datapage.background.HrmDataPage2ManufacturerInformation;
 import be.glever.antplus.hrm.datapage.background.HrmDataPage3ProductInformation;
 import be.glever.antplus.speedcadence.datapage.background.SpeedCadenceDataPage2ManufacturerInformation;
 import be.glever.antplus.speedcadence.datapage.background.SpeedCadenceDataPage3ProductInformation;
-import be.glever.antplus.hrm.datapage.main.HrmDataPage4PreviousHeartBeatEvent;
 import be.glever.util.logging.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * 
+ */
 public class ScanningTest_Main {
     private static final Log LOG = Log.getLogger(ScanningTest_Main.class);
     private ComprehensiveDataPageRegistry registry = new ComprehensiveDataPageRegistry();

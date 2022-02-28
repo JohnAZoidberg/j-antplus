@@ -1,9 +1,21 @@
 package be.glever.ant.message;
 
 import be.glever.ant.AntException;
+import be.glever.ant.message.AbstractAntMessage;
+import be.glever.ant.message.AntMessage;
 import be.glever.ant.message.channel.ChannelEventOrResponseMessage;
-import be.glever.ant.message.configuration.*;
-import be.glever.ant.message.control.*;
+import be.glever.ant.message.configuration.AssignChannelMessage;
+import be.glever.ant.message.configuration.ChannelIdMessage;
+import be.glever.ant.message.configuration.ChannelPeriodMessage;
+import be.glever.ant.message.configuration.ChannelRfFrequencyMessage;
+import be.glever.ant.message.configuration.NetworkKeyMessage;
+import be.glever.ant.message.configuration.SearchTimeoutMessage;
+import be.glever.ant.message.configuration.UnassignChannelMessage;
+import be.glever.ant.message.control.CloseChannelMessage;
+import be.glever.ant.message.control.OpenChannelMessage;
+import be.glever.ant.message.control.OpenRxScanModeMessage;
+import be.glever.ant.message.control.RequestMessage;
+import be.glever.ant.message.control.ResetSystemMessage;
 import be.glever.ant.message.data.BroadcastDataMessage;
 import be.glever.ant.message.notification.SerialErrorMessage;
 import be.glever.ant.message.notification.StartupNotificationMessage;
@@ -13,16 +25,13 @@ import be.glever.ant.message.requestedresponse.ChannelStatusMessage;
 import be.glever.ant.message.requestedresponse.SerialNumberMessage;
 import be.glever.ant.util.ByteUtils;
 import be.glever.util.logging.Log;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.String.format;
-
 /**
- * Container and factory for all known antmessages.
+ * Container and factory for all known ANT messages.
  */
 public class AntMessageRegistry {
     private static final Log LOG = Log.getLogger(AntMessageRegistry.class);
@@ -76,21 +85,21 @@ public class AntMessageRegistry {
         final byte[] msgBytes = Arrays.copyOf(bytes, msgLength);
 
         Class<? extends AbstractAntMessage> messageClass = registry.get(msgId);
-        final AntMessage messageInstance = getMessageInstance(msgBytes, msgId, msgBytes, messageClass);
+        final AntMessage messageInstance = getMessageInstance(msgBytes, msgId, messageClass);
 
-        LOG.trace(() -> format("Converted %s to %s", ByteUtils.hexString(msgBytes), messageInstance.getClass().getSimpleName()));
+        LOG.trace(() -> String.format("Converted %s to %s", ByteUtils.hexString(msgBytes), messageInstance.getClass().getSimpleName()));
         return messageInstance;
     }
 
-    private static AntMessage getMessageInstance(byte[] bytes, byte msgId, byte[] msgBytes, Class<? extends AbstractAntMessage> messageClass) {
+    private static AntMessage getMessageInstance(byte[] msgBytes, byte msgId, Class<? extends AbstractAntMessage> messageClass) {
         AntMessage messageInstance;
         if (messageClass == null) {
-            LOG.error(() -> format("Could not convert %s to an AntMessage. Bytes received were %s", ByteUtils.hexString(msgId),
+            LOG.error(() -> String.format("Could not convert %s to an AntMessage. Bytes received were %s", ByteUtils.hexString(msgId),
                     ByteUtils.hexString(msgBytes)));
-            messageInstance = new UnknownMessage(bytes);
+            messageInstance = new UnknownMessage(msgBytes);
         } else {
             messageInstance = instantiate(messageClass);
-            messageInstance.parse(bytes);
+            messageInstance.parse(msgBytes);
         }
         return messageInstance;
     }
@@ -100,8 +109,8 @@ public class AntMessageRegistry {
         if (registry.containsKey(messageId)) {
             Class<? extends AbstractAntMessage> existingClass = registry.get(messageId);
             throw new IllegalStateException(
-                    format("Could not add class %s to registry due to duplicate id %s. Conflicting class: %s",
-                            antMessageImplClass, messageId, existingClass));
+                    String.format("Could not add class %s to registry due to duplicate id %s. Conflicting class: %s",
+                                  antMessageImplClass, messageId, existingClass));
         }
         registry.put(messageId, antMessageImplClass);
     }
