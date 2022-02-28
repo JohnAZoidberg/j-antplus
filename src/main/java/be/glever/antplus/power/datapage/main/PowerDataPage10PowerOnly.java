@@ -4,6 +4,7 @@ import be.glever.ant.util.ByteUtils;
 import be.glever.antplus.power.PedalPower;
 import be.glever.antplus.power.datapage.AbstractPowerDataPage;
 import be.glever.util.logging.Log;
+import reactor.util.annotation.Nullable;
 
 /**
  * Default or unknown data page.
@@ -21,7 +22,7 @@ public class PowerDataPage10PowerOnly extends AbstractPowerDataPage {
     }
 
     public int getUpdateEventCount() {
-        return getPageSpecificBytes()[0];
+        return ByteUtils.toInt(this.getPageSpecificBytes()[0]);
     }
 
     /**
@@ -29,10 +30,12 @@ public class PowerDataPage10PowerOnly extends AbstractPowerDataPage {
      *
      *
      */
+    @Nullable
     public PedalPower getPedalPowerDistribution() {
-        int pedalPower = getPageSpecificBytes()[1];
+        byte pedalPower = this.getPageSpecificBytes()[1];
         if (pedalPower == -1) {
-            LOG.error(() -> "Invalid pedal power distribution");
+            LOG.debug(() -> "Invalid pedal power distribution");
+            return null;
         }
 
         boolean zeroIsLeft = ByteUtils.hasBitSet(pedalPower, 7);
@@ -46,15 +49,15 @@ public class PowerDataPage10PowerOnly extends AbstractPowerDataPage {
      * Range: 0 - 254 RPM
      */
     public int getInstantaneousCadence() {
-        return getPageSpecificBytes()[2];
+        return ByteUtils.toInt(this.getPageSpecificBytes()[2]);
     }
 
     /**
      * Rollower: 65.536 kW
      * Unit: Watt
      */
-    public double getAccumulatedPower() {
         byte[] pageBytes = getPageSpecificBytes();
+    public int getAccumulatedPower() {
         return ByteUtils.fromUShort(pageBytes[3], pageBytes[4]);
     }
 
